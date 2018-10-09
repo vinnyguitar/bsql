@@ -1,6 +1,6 @@
 import mysql from 'mysql';
 import { createTrigger } from './trigger';
-import { buildWhere } from './builder';
+import { buildWhere, buildGroupBy } from './builder';
 export function jssql(config) {
     const connection = mysql.createConnection(config);
     connection.connect();
@@ -42,8 +42,38 @@ export function jssql(config) {
                 }
             }, () => connection.query(sql.join(' ')));
         },
-        select() {
-
+        select(columns) {
+            const sql = ['SELECT'];
+            sql.push(!columns ? '*' : columns.join(', '));
+            return {
+                from(table) {
+                    sql.push(`FROM ${table}`);
+                    return createTrigger({
+                        where(and, or) {
+                            sql.push(buildWhere(and, or));
+                            return this;
+                        },
+                        groupBy(column) {
+                            sql.push(buildGroupBy(column));
+                            return this;
+                        },
+                        orderBy(order) {
+                            const arr = [];
+                            Object.keys(order).forEach(key => arr.push(`${key} ${order[key]}`));
+                            sql.push(`ORDER BY ${arr.join(',')}`);
+                            return this;
+                        },
+                        limit(limit) {
+                            sql.push(`LIMIT ${limit}`);
+                            return this;
+                        },
+                        offset(offset) {
+                            sql.push(`OFFSET ${offset}`);
+                            return this;
+                        }
+                    }, () => connection.query(sql.join(' ')));
+                }
+            };
         },
         update() {
 
