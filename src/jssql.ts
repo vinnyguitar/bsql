@@ -75,11 +75,36 @@ export function jssql(config) {
                 }
             };
         },
-        update() {
+        update(table) {
+            const sql = [`UPDATE ${table}`];
+            return {
+                set(value) {
+                    if(value.length) {
 
+                    } else {
+                        sql.push(`SET ${connection.escape(value)}`);
+                    }
+                    return createTrigger({
+                        when(column) {
+
+                        },
+                        where(and, or) {
+                            sql.push(buildWhere(and, or));
+                            return this;
+                        }
+                    }, () => connection.query(sql.join(' ')));
+                }
+            }
+            
         },
-        delete() {
-
+        delete(table) {
+            const sql = [`DELETE FROM`];
+            return createTrigger({
+                where(and, or) {
+                    sql.push(buildWhere(and, or));
+                    return this;
+                }
+            }, () => connection.query(sql.join(' ')));
         }
     };
 }
