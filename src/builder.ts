@@ -1,9 +1,13 @@
+import * as mysql from 'mysql';
+
 const oprMap = {
     $gt: '>',
     $gte: '>=',
     $not: '<>',
     $lt: '<',
-    $lte: '<='
+    $lte: '<=',
+    $in: 'IN',
+    $like: 'LIKE'
 };
 
 function parseConditionObject(condition) {
@@ -15,70 +19,25 @@ function parseConditionObject(condition) {
         if (typeof value === 'object') {
             const [opr] = Object.keys(value).filter(k => k in oprMap);
             if (opr) {
-                return `${key}${oprMap[opr]}${value}`;
+                let resultValue = mysql.escape(value[opr]);
+                if(opr === '$in') {
+                    resultValue = `(${resultValue})`
+                }
+                return `${mysql.escapeId(key)} ${oprMap[opr]} ${resultValue}`;
             }
         } else {
-            return `${key}=${value}`;
+            return `${mysql.escapeId(key)} = ${mysql.escape(value)}`;
         }
     });
 }
 
-export const selectBuilder = {
-    select(columns) {
-        const set = new Set(['SELECT']);
-        set.add(!columns ? '*' : columns.join(''));
-        return {
-            from(table) {
-                set.add(`FROM ${table}`);
-                const resolve = () => 1;
-                const reject = () => 2;
-                const exec = (resolve, reject) => 1;
-                const promise = new Promise(exec);
-                return new Proxy(promise, {
-                    get: function (target, key, receiver) {
-                        switch (key) {
-                            case 'then':
-                                break;
-                            case 'where':
-                                break;
-                        }
-                        return target;
-                    }
-                    // where(and, or) {
-                    //     set.add(buildWhere(and, or));
-                    //     return this;
-                    // },
-                    // limit(limit) {
-                    //     set.add(buildLimit(limit));
-                    //     return this;
-                    // },
-                    // offset(limit) {
-                    //     set.add(buildLimit(limit));
-                    //     return this;
-                    // },
-                    // orderBy(order) {
-                    //     set.add(buildOrderBy(order));
-                    //     return this;
-                    // },
-                    // groupBy(column) {
-                    //     set.add(buildGroupBy(column));
-                    //     return this;
-                    // },
-                    // then() {
-
-                    // }
-                });
-            }
-        };
-    }
-};
-
-export function buildWhere(and, or) {
+export function buildWhere(and, or?) {
     return [
         parseConditionObject(and).join(' AND '),
         parseConditionObject(or).join(' OR ')
-
-    ].join(' ');
+    ]
+        .filter(x => !!x)
+        .join(' OR ');
 }
 
 export function buildLimit(limit) {
