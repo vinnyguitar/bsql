@@ -10,6 +10,10 @@ const oprMap = {
     $like: 'LIKE'
 };
 
+function obj2str(obj, sep = '=', join = ',') {
+    return Object.keys(obj).map(key => `${mysql.escapeId(key)}${sep}${obj[key]}`).join(join)
+}
+
 function parseConditionObject(condition) {
     if (!condition) {
         return [];
@@ -20,7 +24,7 @@ function parseConditionObject(condition) {
             const [opr] = Object.keys(value).filter(k => k in oprMap);
             if (opr) {
                 let resultValue = mysql.escape(value[opr]);
-                if(opr === '$in') {
+                if (opr === '$in') {
                     resultValue = `(${resultValue})`
                 }
                 return `${mysql.escapeId(key)} ${oprMap[opr]} ${resultValue}`;
@@ -41,19 +45,19 @@ export function buildWhere(and, or?) {
 }
 
 export function buildLimit(limit) {
-    return `LIMIT=${limit}`;
+    return `LIMIT=${mysql.escape(limit)}`;
 }
 
 export function buildOffset(offset) {
-    return `OFFSET=${offset}`;
+    return `OFFSET=${mysql.escape(offset)}`;
 }
 
 export function buildOrderBy(order) {
-    return '';
+    return `ORDER BY ${obj2str(order, ' ', ', ').replace(/asc/i, 'ASC').replace(/desc/i, 'DESC')}`;
 }
 
 export function buildGroupBy(column) {
-    return '';
+    return `GROUP BY ${mysql.escapeId(column)}`;
 }
 
 export function buildJoin() {
