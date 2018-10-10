@@ -1,21 +1,21 @@
 import { escape, escapeId } from 'mysql';
 import TriggerPromise from './trigger_promise';
-import { buildWhere, buildGroupBy } from './builder';
+import { buildWhere, buildGroupBy, buildSql } from './builder';
 
-export function count(table) {
-    const sql = [`SELECT COUNT(*) FROM ${table}`];
+export function count(table: string) {
+    const sql = {
+        select: `SELECT COUNT(*) FROM ${escapeId(table)}`,
+        where: '',
+    };
     return new TriggerPromise(
         (resolve) => {
-            resolve(sql.join(''));
+            resolve(buildSql([sql.select, sql.where]));
         }, {
             where(and, or) {
-                const where = buildWhere(and, or);
-                if (sql.indexOf(where) === -1) {
-                    sql.push(where);
-                }
+                sql.where = buildWhere(and, or);
                 return this;
             }
-        });
+        }) as any;
 }
 // export default {
 //     count(table, onTrigger) {

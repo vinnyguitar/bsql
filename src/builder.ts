@@ -36,7 +36,7 @@ function parseConditionObject(condition) {
 }
 
 export function buildWhere(and, or?) {
-    return [
+    return 'WHERE ' + [
         parseConditionObject(and).join(' AND '),
         parseConditionObject(or).join(' OR ')
     ]
@@ -62,4 +62,8 @@ export function buildGroupBy(column) {
 
 export function buildJoin() {
     return '';
+}
+
+export function buildSql(list) {
+    return list.filter(x => !!x).join(' ');
 }

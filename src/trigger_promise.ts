@@ -1,4 +1,7 @@
-export default class TriggerPromise {
+interface ITriggerPromise {
+    [propName: string]: any; //动态
+};
+export default class TriggerPromise implements ITriggerPromise {
     constructor(executor, mixin) {
         let resolve;
         let reject;
