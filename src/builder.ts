@@ -7,7 +7,11 @@ const oprMap = {
     $lt: '<',
     $lte: '<=',
     $in: 'IN',
-    $like: 'LIKE'
+    $notIn: 'NOT IN',
+    $like: 'LIKE',
+    $notLike: 'NOT LIKE',
+    $isNull: 'IS NULL',
+    $isNotNull: 'IS NOT NULL',
 };
 
 function obj2str(obj, sep = '=', join = ',') {
