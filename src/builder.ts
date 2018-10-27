@@ -1,4 +1,4 @@
-import * as mysql from 'mysql';
+import { escape, escapeId } from 'mysql';
 
 const oprMap = {
     $gt: '>',
@@ -11,11 +11,11 @@ const oprMap = {
     $like: 'LIKE',
     $notLike: 'NOT LIKE',
     $isNull: 'IS NULL',
-    $isNotNull: 'IS NOT NULL',
+    _isNotNull: 'IS NOT NULL',
 };
 
 function obj2str(obj, sep = '=', join = ',') {
-    return Object.keys(obj).map(key => `${mysql.escapeId(key)}${sep}${obj[key]}`).join(join)
+    return Object.keys(obj).map(key => `${escapeId(key)}${sep}${obj[key]}`).join(join)
 }
 
 function parseConditionObject(condition) {
@@ -25,35 +25,43 @@ function parseConditionObject(condition) {
     return Object.keys(condition).map(key => {
         const value = condition[key];
         if (typeof value === 'object') {
-            const [opr] = Object.keys(value).filter(k => k in oprMap);
+            let [opr] = Object.keys(value).filter(k => k in oprMap);
             if (opr) {
-                let resultValue = mysql.escape(value[opr]);
-                if (opr === '$in') {
+                let resultValue = escape(value[opr]);
+                if (opr === '$in' || opr === '$notIn') {
                     resultValue = `(${resultValue})`
+                } else if (opr === '$isNull') {
+                    if (resultValue === 'false') {
+                        opr = '_isNotNull';
+                    }
+                    resultValue = '';
                 }
-                return `${mysql.escapeId(key)} ${oprMap[opr]} ${resultValue}`;
+                return `${escapeId(key)} ${oprMap[opr]} ${resultValue}`;
             }
         } else {
-            return `${mysql.escapeId(key)} = ${mysql.escape(value)}`;
+            return `${escapeId(key)} = ${escape(value)}`;
         }
-    });
+    })
+        .map(x => x.trim());
 }
 
-export function buildWhere(and, or?) {
-    return 'WHERE ' + [
-        parseConditionObject(and).join(' AND '),
-        parseConditionObject(or).join(' OR ')
-    ]
+export function buildWhere(...args) {
+    let ors = args
+        .map(arg => {
+            const ands = parseConditionObject(arg);
+            if (ands.length === 1 || args.length === 1) return ands.join(' AND ');
+            else return `(${ands.join(' AND ')})`;
+        })
         .filter(x => !!x)
-        .join(' OR ');
+    return 'WHERE ' + ors.join(' OR ');
 }
 
 export function buildLimit(limit) {
-    return `LIMIT=${mysql.escape(limit)}`;
+    return `LIMIT=${escape(limit)}`;
 }
 
 export function buildOffset(offset) {
-    return `OFFSET=${mysql.escape(offset)}`;
+    return `OFFSET=${escape(offset)}`;
 }
 
 export function buildOrderBy(order) {
@@ -61,7 +69,7 @@ export function buildOrderBy(order) {
 }
 
 export function buildGroupBy(column) {
-    return `GROUP BY ${mysql.escapeId(column)}`;
+    return `GROUP BY ${escapeId(column)}`;
 }
 
 export function buildJoin() {
