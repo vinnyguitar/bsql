@@ -1,18 +1,53 @@
 import { escape, escapeId } from 'mysql';
 import TriggerPromise from './trigger_promise';
-import { buildWhere, buildGroupBy, buildSql } from './builder';
+import { buildWhere, buildSql, buildGroupBy, buildOrderBy, buildLimit, buildOffset } from './builder';
 
-export function count(table: string) {
+export function count(table: string, exec: Function) {
     const sql = {
         select: `SELECT COUNT(*) FROM ${escapeId(table)}`,
         where: '',
     };
     return new TriggerPromise(
-        (resolve) => {
-            resolve(buildSql([sql.select, sql.where]));
+        (resolve, reject) => {
+            exec(buildSql([sql.select, sql.where]), resolve, reject)
         }, {
             where(and, or) {
                 sql.where = buildWhere(and, or);
+                return this;
+            }
+        }) as any;
+}
+
+export function select(columns: string[], exec: Function) {
+    const sql: any = {
+        select: `SELECT ${columns.map(c => escapeId(c)).join(',')}`,
+    };
+    return new TriggerPromise(
+        (resolve, reject) => {
+            exec(buildSql([sql.select, sql.from, sql.where, sql.groupBy, sql.orderBy, sql.limit, sql.offset]), resolve, reject)
+        }, {
+            from(table) {
+                sql.from = `FROM ${escapeId(table)}`;
+                return this;
+            },
+            where(...args) {
+                sql.where = buildWhere(...args);
+                return this;
+            },
+            groupBy(column) {
+                sql.groupBy = buildGroupBy(column);
+                return this;
+            },
+            orderBy(orders) {
+                sql.orderBy = buildOrderBy(orders);
+                return this;
+            },
+            limit(num) {
+                sql.limit = buildLimit(num);
+                return this;
+            },
+            offset(num) {
+                sql.offset = buildOffset(num);
                 return this;
             }
         }) as any;

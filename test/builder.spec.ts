@@ -13,11 +13,11 @@ describe('test builder', () => {
     })
 
     test('test buildLimit', () => {
-        expect(buildLimit(10)).toBe('LIMIT=10');
+        expect(buildLimit(10)).toBe('LIMIT 10');
     })
 
     test('test buildOffset', () => {
-        expect(buildOffset(10)).toBe('OFFSET=10');
+        expect(buildOffset(10)).toBe('OFFSET 10');
     })
 
     test('test buildOrderBy', () => {

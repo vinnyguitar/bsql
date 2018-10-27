@@ -57,11 +57,11 @@ export function buildWhere(...args) {
 }
 
 export function buildLimit(limit) {
-    return `LIMIT=${escape(limit)}`;
+    return `LIMIT ${escape(limit)}`;
 }
 
 export function buildOffset(offset) {
-    return `OFFSET=${escape(offset)}`;
+    return `OFFSET ${escape(offset)}`;
 }
 
 export function buildOrderBy(order) {
@@ -70,10 +70,6 @@ export function buildOrderBy(order) {
 
 export function buildGroupBy(column) {
     return `GROUP BY ${escapeId(column)}`;
-}
-
-export function buildJoin() {
-    return '';
 }
 
 export function buildSql(list) {
