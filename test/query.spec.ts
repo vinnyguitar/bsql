@@ -1,4 +1,4 @@
-import { count, select, insertInto, deleteFrom } from '../src/query';
+import { count, select, insertInto, deleteFrom, update } from '../src/query';
 describe('test query', () => {
     test('test count', async () => {
         expect(await count('user', (sql, resolve) => resolve(sql))).toBe('SELECT COUNT(*) FROM `user`');
@@ -25,5 +25,10 @@ describe('test query', () => {
     test('test deleteFrom', async () => {
         expect(await deleteFrom('user', (sql, resolve) => resolve(sql)).where({a: 1}).limit(2).offset(10))
             .toBe('DELETE FROM `user` WHERE `a` = 1 LIMIT 2 OFFSET 10');
+    });
+
+    test('test update', async () => {
+        expect(await update('user', (sql, resolve) => resolve(sql)).set({a: 1, b: 2}).where({c: 3}))
+            .toBe('UPDATE `user` SET `a` = 1, `b` = 2 WHERE `c` = 3');
     });
 });
