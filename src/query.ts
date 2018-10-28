@@ -70,7 +70,7 @@ export function insertInto(table, exec) {
                         keys.push(k);
                     }
                 }));
-                sql.table = `${escapeId(table)}(${keys.map(k => escapeId(k)).join(',')}) VALUES`;
+                sql.table = `${escapeId(table)} (${keys.map(k => escapeId(k)).join(',')}) VALUES`;
                 sql.values = values.map(value => {
                     const arr = new Array(keys.length);
                     Object.keys(value).forEach(k => {
@@ -78,6 +78,29 @@ export function insertInto(table, exec) {
                     });
                     return `(${escape(arr)})`;
                 }).join(',');
+                return this;
+            }
+        }) as any;
+}
+
+export function deleteFrom(table: string, exec: Function) {
+    const sql: any = {
+        deleteFrom: `DELETE FROM ${escapeId(table)}`,
+    };
+    return new TriggerPromise(
+        (resolve, reject) => {
+            exec(buildSql([sql.deleteFrom, sql.where, sql.limit, sql.offset]), resolve, reject)
+        }, {
+            where(...args) {
+                sql.where = buildWhere(...args);
+                return this;
+            },
+            limit(num) {
+                sql.limit = buildLimit(num);
+                return this;
+            },
+            offset(num) {
+                sql.offset = buildOffset(num);
                 return this;
             }
         }) as any;
