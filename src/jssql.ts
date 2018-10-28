@@ -1,21 +1,56 @@
-import mysql from 'mysql';
-import { count } from './query';
+import * as mysql from 'mysql';
+import { count, insertInto, deleteFrom, select } from './query';
 export function jssql(config) {
-    const connection = mysql.createConnection(config);
-    connection.connect();
+    const pool = mysql.createPool(config);
     return {
-        connection,
+        pool,
         count(table) {
             return count(table, (sql, resolve, reject) => {
                 // 操作db
-                connection.query(sql, (err, results, fields) => {
-                    
+                pool.query(sql, (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results[0].count);
+                    }
                 });
             })
         },
         select(columns) {
-
+            return select(columns, (sql, resolve, reject) => {
+                // 操作db
+                pool.query(sql, (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                });
+            })
+        },
+        insertInto(table) {
+            return insertInto(table, (sql, resolve, reject) => {
+                // 操作db
+                pool.query(sql, (err, results, fields) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                });
+            });
+        },
+        deleteFrom(table) {
+            return deleteFrom(table, (sql, resolve, reject) => {
+                // 操作db
+                pool.query(sql, (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                });
+            });
         }
     };
 }
-// db.a().b()

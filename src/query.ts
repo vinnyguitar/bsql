@@ -4,15 +4,15 @@ import { buildWhere, buildSql, buildGroupBy, buildOrderBy, buildLimit, buildOffs
 
 export function count(table: string, exec: Function) {
     const sql = {
-        select: `SELECT COUNT(*) FROM ${escapeId(table)}`,
+        select: `SELECT COUNT(*) AS count FROM ${escapeId(table)}`,
         where: '',
     };
     return new TriggerPromise(
         (resolve, reject) => {
             exec(buildSql([sql.select, sql.where]), resolve, reject)
         }, {
-            where(and, or) {
-                sql.where = buildWhere(and, or);
+            where(...args) {
+                sql.where = buildWhere(...args);
                 return this;
             }
         }) as any;

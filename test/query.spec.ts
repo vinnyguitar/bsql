@@ -1,8 +1,8 @@
 import { count, select, insertInto, deleteFrom, update } from '../src/query';
 describe('test query', () => {
     test('test count', async () => {
-        expect(await count('user', (sql, resolve) => resolve(sql))).toBe('SELECT COUNT(*) FROM `user`');
-        expect(await count('user', (sql, resolve) => resolve(sql)).where({ a: 1 }, { b: 'c' })).toBe('SELECT COUNT(*) FROM `user` WHERE `a` = 1 OR `b` = \'c\'');
+        expect(await count('user', (sql, resolve) => resolve(sql))).toBe('SELECT COUNT(*) AS count FROM `user`');
+        expect(await count('user', (sql, resolve) => resolve(sql)).where({ a: 1 }, { b: 'c' })).toBe('SELECT COUNT(*) AS count FROM `user` WHERE `a` = 1 OR `b` = \'c\'');
     });
 
     test('test select', async () => {
