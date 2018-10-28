@@ -52,6 +52,36 @@ export function select(columns: string[], exec: Function) {
             }
         }) as any;
 }
+
+export function insertInto(table, exec) {
+    const sql = {
+        insert: `INSERT INTO`,
+        table: '',
+        values: ''
+    };
+    return new TriggerPromise(
+        (resolve, reject) => {
+            exec(buildSql([sql.insert, sql.table, sql.values]), resolve, reject)
+        }, {
+            values(values) {
+                const keys = [];
+                values.forEach(value => Object.keys(value).forEach(k => {
+                    if (keys.indexOf(k) === -1) {
+                        keys.push(k);
+                    }
+                }));
+                sql.table = `${escapeId(table)}(${keys.map(k => escapeId(k)).join(',')}) VALUES`;
+                sql.values = values.map(value => {
+                    const arr = new Array(keys.length);
+                    Object.keys(value).forEach(k => {
+                        arr[keys.indexOf(k)] = value[k];
+                    });
+                    return `(${escape(arr)})`;
+                }).join(',');
+                return this;
+            }
+        }) as any;
+}
 // export default {
 //     count(table, onTrigger) {
 //         const sql = [`SELECT COUNT(*) FROM ${table}`];
