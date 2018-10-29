@@ -33,4 +33,9 @@ describe('jssql e2e test', async () => {
         const result = await db.select(['name', 'age']).from('sql_test').where({ age: { $gte: 1 } });
         expect(result).toEqual(testData);
     });
+
+    test('update', async () => {
+        const result = await db.update('sql_test').set({name: 'xyz'}).where({name: 'abc'});
+        expect(result.affectedRows).toEqual(1);
+    });
 });

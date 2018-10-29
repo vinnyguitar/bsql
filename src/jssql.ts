@@ -1,5 +1,5 @@
 import * as mysql from 'mysql';
-import { count, insertInto, deleteFrom, select } from './query';
+import { count, insertInto, deleteFrom, select, update } from './query';
 export function jssql(config) {
     const pool = mysql.createPool(config);
     return {
@@ -42,6 +42,18 @@ export function jssql(config) {
         },
         deleteFrom(table) {
             return deleteFrom(table, (sql, resolve, reject) => {
+                // 操作db
+                pool.query(sql, (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                });
+            });
+        },
+        update(table) {
+            return update(table, (sql, resolve, reject) => {
                 // 操作db
                 pool.query(sql, (err, results) => {
                     if (err) {
