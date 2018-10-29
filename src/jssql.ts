@@ -31,7 +31,7 @@ export function jssql(config) {
         insertInto(table) {
             return insertInto(table, (sql, resolve, reject) => {
                 // 操作db
-                pool.query(sql, (err, results, fields) => {
+                pool.query(sql, (err, results) => {
                     if (err) {
                         reject(err);
                     } else {
