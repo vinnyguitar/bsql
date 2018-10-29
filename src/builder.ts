@@ -14,10 +14,6 @@ const oprMap = {
     _isNotNull: 'IS NOT NULL',
 };
 
-function obj2str(obj, sep = '=', join = ',') {
-    return Object.keys(obj).map(key => `${escapeId(key)}${sep}${obj[key]}`).join(join)
-}
-
 function parseConditionObject(condition) {
     if (!condition) {
         return [];
@@ -46,14 +42,19 @@ function parseConditionObject(condition) {
 }
 
 export function buildWhere(...args) {
-    let ors = args
-        .map(arg => {
-            const ands = parseConditionObject(arg);
-            if (ands.length === 1 || args.length === 1) return ands.join(' AND ');
-            else return `(${ands.join(' AND ')})`;
-        })
-        .filter(x => !!x)
-    return 'WHERE ' + ors.join(' OR ');
+    if (typeof args[0] === 'string') {
+        return `WHERE ${args[0]}`;
+    } else {
+        let ors = args
+            .map(arg => {
+                const ands = parseConditionObject(arg);
+                if (ands.length === 1 || args.length === 1) return ands.join(' AND ');
+                else return `(${ands.join(' AND ')})`;
+            })
+            .filter(x => !!x)
+        return 'WHERE ' + ors.join(' OR ');
+    }
+
 }
 
 export function buildLimit(limit) {
@@ -65,7 +66,8 @@ export function buildOffset(offset) {
 }
 
 export function buildOrderBy(order) {
-    return `ORDER BY ${obj2str(order, ' ', ', ').replace(/asc/i, 'ASC').replace(/desc/i, 'DESC')}`;
+    const orders = Object.keys(order).map(key => `${escapeId(key)} ${order[key]}`).join(', ')
+    return `ORDER BY ${orders.replace(/asc/i, 'ASC').replace(/desc/i, 'DESC')}`;
 }
 
 export function buildGroupBy(column) {
