@@ -1,4 +1,4 @@
-import { jssql } from '../src/jssql';
+import { jssql } from '../src/index';
 
 const db = jssql({
     host: 'cd-cdb-lkbs4hfm.sql.tencentcdb.com',
@@ -35,7 +35,7 @@ describe('jssql e2e test', async () => {
     });
 
     test('update', async () => {
-        const result = await db.update('sql_test').set({name: 'xyz'}).where({name: 'abc'});
+        const result = await db.update('sql_test').set({ name: 'xyz' }).where({ name: 'abc' });
         expect(result.affectedRows).toEqual(1);
     });
 });
