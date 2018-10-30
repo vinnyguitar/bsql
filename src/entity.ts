@@ -1,30 +1,16 @@
-const entityConfigs = new Map();
-function createEntity(def: any, row: object) {
-    const entity = new def();
-    const { columns } = entityConfigs.get(def);
-    columns.forEach(([columnName, propertyName]) => {
-        const value = row[columnName];
-        if (value !== undefined)
-            entity[propertyName] = value;
-    });
-    return entity;
-}
-
 export class Entity {
-    static from(row): Entity | Entity[] {
-        if (Object.prototype.toString.call(row) === '[object Array]') {
-            return row.map(r => createEntity(this, r));
-        } else {
-            return createEntity(this, row);
-        }
+    constructor(row: object) {
+        const { columns = [] } = this.constructor as any;
+        columns.forEach(([columnName, propertyName]) => {
+            const value = row[columnName];
+            if (value !== undefined) {
+                this[propertyName] = value;
+            }
+        });
     }
 
-    static toRows(entities: Entity[]) {
-        return entities.map(e => e.toRow());
-    }
-
-    toRow(): any {
-        const { columns } = entityConfigs.get(this.constructor);
+    public toRow(): object {
+        const { columns = [] } = this.constructor as any;
         const row = {};
         columns.forEach(([columnName, propertyName]) => {
             const value = this[propertyName];
@@ -38,9 +24,9 @@ export class Entity {
 
 export function Column(name) {
     return (target, propertyName) => {
-        const key = target.constructor;
-        const config = entityConfigs.get(key) || { columns: [] };
-        config.columns.push([name, propertyName]);
-        entityConfigs.set(key, config);
+        const { constructor } = target;
+        const columns = constructor.columns || [];
+        columns.push([name, propertyName]);
+        constructor.columns = columns;
     };
 }

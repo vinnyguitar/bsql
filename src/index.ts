@@ -1,5 +1,5 @@
-import * as mysql from 'mysql';
-import { count, insertInto, deleteFrom, select, update } from './query';
+import * as mysql from "mysql";
+import { count, deleteFrom, insertInto, select, update } from "./query";
 export function jssql(config) {
     const pool = mysql.createPool(config);
     return {
@@ -14,7 +14,7 @@ export function jssql(config) {
                         resolve(results[0].count);
                     }
                 });
-            })
+            });
         },
         select(columns) {
             return select(columns, (sql, resolve, reject) => {
@@ -26,7 +26,7 @@ export function jssql(config) {
                         resolve(results);
                     }
                 });
-            })
+            });
         },
         insertInto(table) {
             return insertInto(table, (sql, resolve, reject) => {
@@ -63,6 +63,6 @@ export function jssql(config) {
                     }
                 });
             });
-        }
+        },
     };
 }

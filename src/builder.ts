@@ -1,58 +1,61 @@
-import { escape, escapeId } from 'mysql';
+import { escape, escapeId } from "mysql";
 
-const oprMap = {
-    $gt: '>',
-    $gte: '>=',
-    $not: '<>',
-    $lt: '<',
-    $lte: '<=',
-    $in: 'IN',
-    $notIn: 'NOT IN',
-    $like: 'LIKE',
-    $notLike: 'NOT LIKE',
-    $isNull: 'IS NULL',
-    _isNotNull: 'IS NOT NULL',
-};
+const map = new Map([
+    ["$not", "<>"],
+    ["$gt", ">"],
+    ["$gte", ">="],
+    ["$lt", "<"],
+    ["$lte", "<="],
+    ["$in", "IN"],
+    ["$notIn", "NOT IN"],
+    ["$like", "LIKE"],
+    ["$notLike", "NOT LIKE"],
+    ["$isNull", "IS NULL"],
+    ["_isNotNull", "IS NOT NULL"],
+]);
 
 function parseConditionObject(condition) {
     if (!condition) {
         return [];
     }
-    return Object.keys(condition).map(key => {
+    return Object.keys(condition).map((key) => {
         const value = condition[key];
-        if (typeof value === 'object') {
-            let [opr] = Object.keys(value).filter(k => k in oprMap);
+        if (typeof value === "object") {
+            let [opr] = Object.keys(value).filter((k) => map.has(k));
             if (opr) {
                 let resultValue = escape(value[opr]);
-                if (opr === '$in' || opr === '$notIn') {
-                    resultValue = `(${resultValue})`
-                } else if (opr === '$isNull') {
-                    if (resultValue === 'false') {
-                        opr = '_isNotNull';
+                if (opr === "$in" || opr === "$notIn") {
+                    resultValue = `(${resultValue})`;
+                } else if (opr === "$isNull") {
+                    if (resultValue === "false") {
+                        opr = "_isNotNull";
                     }
-                    resultValue = '';
+                    resultValue = "";
                 }
-                return `${escapeId(key)} ${oprMap[opr]} ${resultValue}`;
+                return `${escapeId(key)} ${map.get(opr)} ${resultValue}`;
             }
         } else {
             return `${escapeId(key)} = ${escape(value)}`;
         }
     })
-        .map(x => x.trim());
+        .map((x) => x.trim());
 }
 
 export function buildWhere(...args) {
-    if (typeof args[0] === 'string') {
+    if (typeof args[0] === "string") {
         return `WHERE ${args[0]}`;
     } else {
-        let ors = args
-            .map(arg => {
+        const ors = args
+            .map((arg) => {
                 const ands = parseConditionObject(arg);
-                if (ands.length === 1 || args.length === 1) return ands.join(' AND ');
-                else return `(${ands.join(' AND ')})`;
+                if (ands.length === 1 || args.length === 1) {
+                    return ands.join(" AND ");
+                } else {
+                    return `(${ands.join(" AND ")})`;
+                }
             })
-            .filter(x => !!x)
-        return 'WHERE ' + ors.join(' OR ');
+            .filter((x) => !!x);
+        return "WHERE " + ors.join(" OR ");
     }
 
 }
@@ -66,8 +69,8 @@ export function buildOffset(offset) {
 }
 
 export function buildOrderBy(order) {
-    const orders = Object.keys(order).map(key => `${escapeId(key)} ${order[key]}`).join(', ')
-    return `ORDER BY ${orders.replace(/asc/i, 'ASC').replace(/desc/i, 'DESC')}`;
+    const orders = Object.keys(order).map((key) => `${escapeId(key)} ${order[key]}`).join(", ");
+    return `ORDER BY ${orders.replace(/asc/i, "ASC").replace(/desc/i, "DESC")}`;
 }
 
 export function buildGroupBy(column) {
@@ -75,5 +78,5 @@ export function buildGroupBy(column) {
 }
 
 export function buildSql(list) {
-    return list.filter(x => !!x).join(' ');
+    return list.filter((x) => !!x).join(" ");
 }
