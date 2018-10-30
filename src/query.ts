@@ -2,7 +2,50 @@ import { escape, escapeId } from "mysql";
 import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, buildSql, buildWhere } from "./builder";
 import TriggerPromise from "./trigger_promise";
 
-export function count(table: string, exec: Function) {
+export interface IResult {
+    fieldCount: number;
+    affectedRows: number;
+    insertId: number;
+    serverStatus: number;
+    warningCount: number;
+    message: string;
+    protocol41: boolean;
+    changedRows: number;
+}
+export interface ICount extends Promise<number> {
+    where(condiction: string): ICount;
+    where(...condictions: object[]): ICount;
+}
+
+export interface ISelect extends Promise<object[]> {
+    from(table: string): ISelect;
+    where(condiction: string): ISelect;
+    where(...condictions: object[]): ISelect;
+    groupBy(column: string): ISelect;
+    orderBy(orders: object): ISelect;
+    limit(limit: number): ISelect;
+    offset(offset: number): ISelect;
+
+}
+
+export interface IInsert extends Promise<IResult> {
+    values(values: object[]): IInsert;
+}
+
+export interface IDelete extends Promise<IResult> {
+    where(condiction: string): IDelete;
+    where(...condictions: object[]): IDelete;
+    limit(limit: number): IDelete;
+    offset(offset: number): IDelete;
+}
+
+export interface IUpdate extends Promise<IResult> {
+    where(condiction: string): IUpdate;
+    where(...condictions: object[]): IUpdate;
+    set(value: object): IUpdate;
+}
+
+export function count(table: string, exec: (sql, resolve, reject) => void) {
     const sql = {
         select: `SELECT COUNT(*) AS count FROM ${escapeId(table)}`,
         where: "",
@@ -15,16 +58,17 @@ export function count(table: string, exec: Function) {
                 sql.where = buildWhere(...args);
                 return this;
             },
-        }) as any;
+        }) as ICount;
 }
 
-export function select(columns: string[], exec: Function) {
+export function select(columns: string[], exec: (sql, resolve, reject) => void) {
     const sql: any = {
         select: `SELECT ${columns.map((c) => escapeId(c)).join(",")}`,
     };
     return new TriggerPromise(
         (resolve, reject) => {
-            exec(buildSql([sql.select, sql.from, sql.where, sql.groupBy, sql.orderBy, sql.limit, sql.offset]), resolve, reject);
+            exec(buildSql([sql.select, sql.from, sql.where, sql.groupBy,
+            sql.orderBy, sql.limit, sql.offset]), resolve, reject);
         }, {
             from(table) {
                 sql.from = `FROM ${escapeId(table)}`;
@@ -50,10 +94,10 @@ export function select(columns: string[], exec: Function) {
                 sql.offset = buildOffset(num);
                 return this;
             },
-        }) as any;
+        }) as ISelect;
 }
 
-export function insertInto(table, exec) {
+export function insertInto(table, exec: (sql, resolve, reject) => void) {
     const sql = {
         insert: `INSERT INTO`,
         table: "",
@@ -80,10 +124,10 @@ export function insertInto(table, exec) {
                 }).join(",");
                 return this;
             },
-        }) as any;
+        }) as IInsert;
 }
 
-export function deleteFrom(table: string, exec: Function) {
+export function deleteFrom(table: string, exec: (sql, resolve, reject) => void) {
     const sql: any = {
         deleteFrom: `DELETE FROM ${escapeId(table)}`,
     };
@@ -103,10 +147,10 @@ export function deleteFrom(table: string, exec: Function) {
                 sql.offset = buildOffset(num);
                 return this;
             },
-        }) as any;
+        }) as IDelete;
 }
 
-export function update(table: string, exec: Function) {
+export function update(table: string, exec: (sql, resolve, reject) => void) {
     const sql: any = {
         update: `UPDATE ${escapeId(table)}`,
     };
@@ -122,5 +166,5 @@ export function update(table: string, exec: Function) {
                 sql.set = `SET ${escape(value)}`;
                 return this;
             },
-        }) as any;
+        }) as IUpdate;
 }
