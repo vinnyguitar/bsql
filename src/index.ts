@@ -5,6 +5,7 @@ import { Column, Entity } from "./entity";
 export {
     Column,
     Entity,
+    Client as BsqlClient,
 };
 
 export const escape = mysql.escape;
