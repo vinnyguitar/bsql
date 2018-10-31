@@ -69,21 +69,21 @@ db.select().from('user').limit(20).offset(19);
 ```
 
 ### count
-```
+```js
 const count = await db.count('user').where({age: {$gt: 20}}); // SELECT COUNT(*) as count FROM `user` WHERE `age` > 20;
 ```
 
 ### insert
-```
+```js
 await db.insertInto('user').values([{name: 'lili', age: 21}, {name: 'lucy', age: 22}]); // INSERT INTO `user` (`name`, `age`) VALUES ('lili', 21), (lucy, 22);
 ```
 
 ### update
-```
+```js
 await db.update('user').set({age: 23, gender: 2}).where({name: 'lili'}); // UPDATE `user` SET `age` = 23, `gender` = 2 WHERE `name` = 'lili';
 ```
 
 ### delete
-```
+```js
 await db.deleteFrom('table').where({name: 'lucy'}); // DELETE FROM `user` WHERE `name` = 'lucy';
 ```
