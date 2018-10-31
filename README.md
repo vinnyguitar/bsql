@@ -32,7 +32,7 @@ const rows = await db
 	.select(['id', 'name', 'age', 'gender']) // SELECT `id`, `name`, `age`, `gender`
 	.from('user') // FROM `user`
 	.where({gender: 1}) // WHERE `age` = 20 and `gender` = 1
-	.orderBy([['age', -1]]) // ORDER BY `age` DESC
+	.orderBy(['age', -1]) // ORDER BY `age` DESC
 	.limit(20) // LIMIT 20
 	.offset(9);// OFFSET 9
 console.log(rows);

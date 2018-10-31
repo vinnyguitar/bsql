@@ -68,9 +68,9 @@ export function buildOffset(offset) {
     return `OFFSET ${escape(offset)}`;
 }
 
-export function buildOrderBy(order) {
-    const orders = Object.keys(order).map((key) => `${escapeId(key)} ${order[key]}`).join(", ");
-    return `ORDER BY ${orders.replace(/asc/i, "ASC").replace(/desc/i, "DESC")}`;
+export function buildOrderBy(...orders) {
+    const orderSql = orders.map(([key, sort]) => `${escapeId(key)} ${sort > 0 ? "ASC" : "DESC"}`).join(", ");
+    return `ORDER BY ${orderSql}`;
 }
 
 export function buildGroupBy(column) {

@@ -22,7 +22,7 @@ export interface ISelect extends Promise<object[]> {
     where(condiction: string): ISelect;
     where(...condictions: object[]): ISelect;
     groupBy(column: string): ISelect;
-    orderBy(orders: object): ISelect;
+    orderBy(...orders: Array<[string, number]>): ISelect;
     limit(limit: number): ISelect;
     offset(offset: number): ISelect;
 
@@ -82,8 +82,8 @@ export function select(columns: string[], exec: (sql, resolve, reject) => void) 
                 sql.groupBy = buildGroupBy(column);
                 return this;
             },
-            orderBy(orders) {
-                sql.orderBy = buildOrderBy(orders);
+            orderBy(...orders) {
+                sql.orderBy = buildOrderBy(...orders);
                 return this;
             },
             limit(num) {

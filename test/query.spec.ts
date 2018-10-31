@@ -12,7 +12,7 @@ describe("test query", () => {
             .from("user")
             .where({ age: { $gt: 1 } })
             .groupBy("age")
-            .orderBy({ age: "desc" })
+            .orderBy(["age", -1])
             .limit(10)
             .offset(9);
         const tobe = "SELECT `name`,`age` FROM `user` WHERE `age` > 1 " +

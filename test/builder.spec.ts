@@ -30,7 +30,7 @@ describe("test builder", () => {
     });
 
     test("buildOrderBy", () => {
-        expect(buildOrderBy({ a: "asc", b: "desc" })).toBe("ORDER BY `a` ASC, `b` DESC");
+        expect(buildOrderBy(["a", 1], ["b", -1])).toBe("ORDER BY `a` ASC, `b` DESC");
     });
 
     test("buildGroupBy", () => {
