@@ -1,6 +1,6 @@
 {
   "name": "bsql",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "start": "ts-node",
     "prepublish": "tsc",
@@ -32,7 +32,7 @@
     "coverageDirectory": "../coverage"
   },
   "description": "Mysql client of sql styled api.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "directories": {
     "test": "test"
   },
