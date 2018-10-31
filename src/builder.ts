@@ -1,4 +1,4 @@
-import { escape, escapeId } from "mysql";
+import { escape, escapeId, format } from "mysql";
 
 const map = new Map([
     ["$not", "<>"],
@@ -43,7 +43,7 @@ function parseConditionObject(condition) {
 
 export function buildWhere(...args) {
     if (typeof args[0] === "string") {
-        return `WHERE ${args[0]}`;
+        return `WHERE ${format(args[0], args[1])}`;
     } else {
         const ors = args
             .map((arg) => {
@@ -77,6 +77,6 @@ export function buildGroupBy(column) {
     return `GROUP BY ${escapeId(column)}`;
 }
 
-export function buildSql(list) {
+export function joinSql(list) {
     return list.filter((x) => !!x).join(" ");
 }

@@ -3,9 +3,9 @@ import { connect } from "../src/index";
 const db = connect({
     database: "test",
     host: "cd-cdb-lkbs4hfm.sql.tencentcdb.com",
-    password: "beVT2z*7zPsk^g",
+    password: "qa1234!!",
     port: "63841",
-    user: "ib_dev",
+    user: "test",
 });
 
 const testData = [

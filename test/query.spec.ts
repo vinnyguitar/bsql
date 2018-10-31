@@ -15,10 +15,20 @@ describe("test query", () => {
             .orderBy(["age", -1])
             .limit(10)
             .offset(9);
-        const tobe = "SELECT `name`,`age` FROM `user` WHERE `age` > 1 " +
+        const tobe = "SELECT `name`, `age` FROM `user` WHERE `age` > 1 " +
             "GROUP BY `age` ORDER BY `age` DESC LIMIT 10 OFFSET 9";
         expect(sql).toBe(tobe);
     });
+
+    test("test select *", async () => {
+        const sql = await select(null, (sql1, resolve) => resolve(sql1))
+            .from("user");
+        const sql2 = await select('*', (sql1, resolve) => resolve(sql1))
+            .from("user");
+        const tobe = "SELECT * FROM `user`";
+        expect(sql).toBe(tobe);
+        expect(sql2).toBe(tobe);
+    })
 
     test("test insertInto", async () => {
         const vs = [{ a: 1, b: 2 }, { a: 2, b: 3, c: 4 }];

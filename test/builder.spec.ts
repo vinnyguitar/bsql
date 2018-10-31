@@ -6,10 +6,10 @@ describe("test builder", () => {
     });
 
     test("where text", () => {
-        expect(buildWhere("`a` = 1 OR `b` = 2")).toBe("WHERE `a` = 1 OR `b` = 2");
+        expect(buildWhere("`a` = 1 OR `b` = ?", [2])).toBe("WHERE `a` = 1 OR `b` = 2");
     });
 
-    test("where with more operator", () => {
+    test("where with more operation", () => {
         expect(buildWhere({ a: { $gt: 1 }, b: { $gte: 2 }, c: { $not: 3 } }))
             .toBe("WHERE `a` > 1 AND `b` >= 2 AND `c` <> 3");
         expect(buildWhere({ a: { $lt: 1 }, b: { $lte: 2 }, c: { $in: [1, 2, 3] } }))

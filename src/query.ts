@@ -1,5 +1,5 @@
 import { escape, escapeId } from "mysql";
-import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, buildSql, buildWhere } from "./builder";
+import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, joinSql, buildWhere } from "./builder";
 import TriggerPromise from "./trigger_promise";
 
 export interface IResult {
@@ -45,29 +45,22 @@ export interface IUpdate extends Promise<IResult> {
     set(value: object): IUpdate;
 }
 
-export function count(table: string, exec: (sql, resolve, reject) => void) {
-    const sql = {
-        select: `SELECT COUNT(*) AS count FROM ${escapeId(table)}`,
-        where: "",
-    };
-    return new TriggerPromise(
-        (resolve, reject) => {
-            exec(buildSql([sql.select, sql.where]), resolve, reject);
-        }, {
-            where(...args) {
-                sql.where = buildWhere(...args);
-                return this;
-            },
-        }) as ICount;
-}
 
-export function select(columns: string[], exec: (sql, resolve, reject) => void) {
+
+export function select(columns: string[] | string, exec: (sql, resolve, reject) => void) {
     const sql: any = {
-        select: `SELECT ${columns.map((c) => escapeId(c)).join(",")}`,
+        select: 'SELECT',
     };
+    if (!columns) {
+        sql.columns = '*';
+    } else if (columns instanceof Array) {
+        sql.columns = columns.map((c) => escapeId(c)).join(", ");
+    } else {
+        sql.columns = columns;
+    }
     return new TriggerPromise(
         (resolve, reject) => {
-            exec(buildSql([sql.select, sql.from, sql.where, sql.groupBy,
+            exec(joinSql([sql.select, sql.columns, sql.from, sql.where, sql.groupBy,
             sql.orderBy, sql.limit, sql.offset]), resolve, reject);
         }, {
             from(table) {
@@ -97,6 +90,22 @@ export function select(columns: string[], exec: (sql, resolve, reject) => void) 
         }) as ISelect;
 }
 
+export function count(table: string, exec: (sql, resolve, reject) => void) {
+    const sql = {
+        select: `SELECT COUNT(*) AS count FROM ${escapeId(table)}`,
+        where: "",
+    };
+    return new TriggerPromise(
+        (resolve, reject) => {
+            exec(joinSql([sql.select, sql.where]), resolve, reject);
+        }, {
+            where(...args) {
+                sql.where = buildWhere(...args);
+                return this;
+            },
+        }) as ICount;
+}
+
 export function insertInto(table, exec: (sql, resolve, reject) => void) {
     const sql = {
         insert: `INSERT INTO`,
@@ -105,7 +114,7 @@ export function insertInto(table, exec: (sql, resolve, reject) => void) {
     };
     return new TriggerPromise(
         (resolve, reject) => {
-            exec(buildSql([sql.insert, sql.table, sql.values]), resolve, reject);
+            exec(joinSql([sql.insert, sql.table, sql.values]), resolve, reject);
         }, {
             values(values) {
                 const keys = [];
@@ -133,7 +142,7 @@ export function deleteFrom(table: string, exec: (sql, resolve, reject) => void) 
     };
     return new TriggerPromise(
         (resolve, reject) => {
-            exec(buildSql([sql.deleteFrom, sql.where, sql.limit, sql.offset]), resolve, reject);
+            exec(joinSql([sql.deleteFrom, sql.where, sql.limit, sql.offset]), resolve, reject);
         }, {
             where(...args) {
                 sql.where = buildWhere(...args);
@@ -156,7 +165,7 @@ export function update(table: string, exec: (sql, resolve, reject) => void) {
     };
     return new TriggerPromise(
         (resolve, reject) => {
-            exec(buildSql([sql.update, sql.set, sql.where]), resolve, reject);
+            exec(joinSql([sql.update, sql.set, sql.where]), resolve, reject);
         }, {
             where(...args) {
                 sql.where = buildWhere(...args);
