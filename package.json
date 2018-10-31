@@ -1,4 +1,6 @@
 {
+  "name": "bsql",
+  "version": "0.0.1",
   "scripts": {
     "start": "ts-node",
     "build": "tsc",
@@ -27,5 +29,24 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "coverageDirectory": "../coverage"
-  }
+  },
+  "description": "Mysql client of sql styled api.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinnyguitar/bsql.git"
+  },
+  "keywords": [
+    "sql",
+    "mysql"
+  ],
+  "author": "vinnyguitar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vinnyguitar/bsql/issues"
+  },
+  "homepage": "https://github.com/vinnyguitar/bsql#readme"
 }
