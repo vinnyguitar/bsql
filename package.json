@@ -3,7 +3,7 @@
   "version": "0.0.6",
   "scripts": {
     "start": "ts-node",
-    "prepublish": "tsc",
+    "prepare": "tsc",
     "build": "tsc",
     "test": "jest"
   },
