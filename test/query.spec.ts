@@ -21,13 +21,10 @@ describe("test query", () => {
     });
 
     test("test select *", async () => {
-        const sql = await select(null, (sql1, resolve) => resolve(sql1))
-            .from("user");
-        const sql2 = await select('*', (sql1, resolve) => resolve(sql1))
+        const sql = await select('*', (sql1, resolve) => resolve(sql1))
             .from("user");
         const tobe = "SELECT * FROM `user`";
         expect(sql).toBe(tobe);
-        expect(sql2).toBe(tobe);
     })
 
     test("test insertInto", async () => {

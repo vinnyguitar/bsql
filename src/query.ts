@@ -51,9 +51,7 @@ export function select(columns: string[] | string, exec: (sql, resolve, reject) 
     const sql: any = {
         select: 'SELECT',
     };
-    if (!columns) {
-        sql.columns = '*';
-    } else if (columns instanceof Array) {
+    if (columns instanceof Array) {
         sql.columns = columns.map((c) => escapeId(c)).join(", ");
     } else {
         sql.columns = columns;
