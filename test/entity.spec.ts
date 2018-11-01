@@ -20,8 +20,8 @@ describe("test entity", () => {
         expect(user.toRow()).toEqual({ name: "abc", age: 1, created_at: 123 });
     });
     test("test mrege", async () => {
-        const user = new User({created_at: 123 });
-        user.merge({ name: "abc", age: 1, });
+        const user = new User({ created_at: 123 });
+        user.merge({ name: "abc", }, { age: 1 });
         expect(user.toRow()).toEqual({ name: "abc", age: 1, created_at: 123 });
     });
 });

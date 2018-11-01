@@ -11,13 +11,15 @@ export class Entity {
         }
     }
 
-    public merge(values: object) {
+    public merge(...args: object[]) {
         const { columns = [] } = this.constructor as any;
-        columns.forEach(([columnName, propertyName]) => {
-            const value = values[propertyName];
-            if (value !== undefined) {
-                this[propertyName] = value;
-            }
+        args.forEach(values => {
+            columns.forEach(([columnName, propertyName]) => {
+                const value = values[propertyName];
+                if (value !== undefined) {
+                    this[propertyName] = value;
+                }
+            });
         });
     }
 
