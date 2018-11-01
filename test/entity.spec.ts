@@ -16,7 +16,12 @@ describe("test entity", () => {
         expect(new User({ name: "abc", age: 1, created_at: 123 })).toEqual({ name: "abc", age: 1, createAt: 123 });
     });
     test("test to row", async () => {
-        const user = new User({ name: "abc", age: 1, created_at: 123 }) as User;
+        const user = new User({ name: "abc", age: 1, created_at: 123 });
+        expect(user.toRow()).toEqual({ name: "abc", age: 1, created_at: 123 });
+    });
+    test("test mrege", async () => {
+        const user = new User({created_at: 123 });
+        user.merge({ name: "abc", age: 1, });
         expect(user.toRow()).toEqual({ name: "abc", age: 1, created_at: 123 });
     });
 });

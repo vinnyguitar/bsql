@@ -1,8 +1,20 @@
 export class Entity {
-    constructor(row: object) {
+    constructor(row?: object) {
+        if (row) {
+            const { columns = [] } = this.constructor as any;
+            columns.forEach(([columnName, propertyName]) => {
+                const value = row[columnName];
+                if (value !== undefined) {
+                    this[propertyName] = value;
+                }
+            });
+        }
+    }
+
+    public merge(values: object) {
         const { columns = [] } = this.constructor as any;
         columns.forEach(([columnName, propertyName]) => {
-            const value = row[columnName];
+            const value = values[propertyName];
             if (value !== undefined) {
                 this[propertyName] = value;
             }
