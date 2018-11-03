@@ -1,4 +1,5 @@
 import { count, deleteFrom, insertInto, select, update } from "./query";
+import { transformToEntity } from './case_transform';
 
 /**
  * Database connection client.
@@ -62,6 +63,18 @@ export class Client {
             });
         });
     }
+
+    public query(sql, values?) {
+        return new Promise((resolve, reject) => {
+            this.db.query(sql, values, (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+    }
 }
 
 function createExecutor(db) {
@@ -70,7 +83,7 @@ function createExecutor(db) {
             if (err) {
                 reject(err);
             } else {
-                resolve(results);
+                resolve(transformToEntity(results));
             }
         });
     };

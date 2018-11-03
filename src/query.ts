@@ -1,6 +1,7 @@
 import { escape, escapeId } from "mysql";
 import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, joinSql, buildWhere } from "./builder";
 import TriggerPromise from "./trigger_promise";
+import { transformToDb } from './case_transform';
 
 export interface IResult {
     fieldCount: number;
@@ -52,7 +53,7 @@ export function select(columns: string[] | string, exec: (sql, resolve, reject) 
         select: 'SELECT',
     };
     if (columns instanceof Array) {
-        sql.columns = columns.map((c) => escapeId(c)).join(", ");
+        sql.columns = transformToDb(columns).map((c) => escapeId(c)).join(", ");
     } else {
         sql.columns = columns;
     }
@@ -62,19 +63,19 @@ export function select(columns: string[] | string, exec: (sql, resolve, reject) 
             sql.orderBy, sql.limit, sql.offset]), resolve, reject);
         }, {
             from(table) {
-                sql.from = `FROM ${escapeId(table)}`;
+                sql.from = `FROM ${escapeId(transformToDb(table))}`;
                 return this;
             },
             where(...args) {
-                sql.where = buildWhere(...args);
+                sql.where = buildWhere(...transformToDb(args));
                 return this;
             },
             groupBy(column) {
-                sql.groupBy = buildGroupBy(column);
+                sql.groupBy = buildGroupBy(transformToDb(column));
                 return this;
             },
             orderBy(...orders) {
-                sql.orderBy = buildOrderBy(...orders);
+                sql.orderBy = buildOrderBy(...transformToDb(orders));
                 return this;
             },
             limit(num) {
@@ -90,7 +91,7 @@ export function select(columns: string[] | string, exec: (sql, resolve, reject) 
 
 export function count(table: string, exec: (sql, resolve, reject) => void) {
     const sql = {
-        select: `SELECT COUNT(*) AS count FROM ${escapeId(table)}`,
+        select: `SELECT COUNT(*) AS count FROM ${escapeId(transformToDb(table))}`,
         where: "",
     };
     return new TriggerPromise(
@@ -98,7 +99,7 @@ export function count(table: string, exec: (sql, resolve, reject) => void) {
             exec(joinSql([sql.select, sql.where]), resolve, reject);
         }, {
             where(...args) {
-                sql.where = buildWhere(...args);
+                sql.where = buildWhere(...transformToDb(args));
                 return this;
             },
         }) as ICount;
@@ -115,14 +116,15 @@ export function insertInto(table, exec: (sql, resolve, reject) => void) {
             exec(joinSql([sql.insert, sql.table, sql.values]), resolve, reject);
         }, {
             values(values) {
+                const dbValues = transformToDb(values);
                 const keys = [];
-                values.forEach((value) => Object.keys(value).forEach((k) => {
+                dbValues.forEach((value) => Object.keys(value).forEach((k) => {
                     if (keys.indexOf(k) === -1) {
                         keys.push(k);
                     }
                 }));
-                sql.table = `${escapeId(table)} (${keys.map((k) => escapeId(k)).join(",")}) VALUES`;
-                sql.values = values.map((value) => {
+                sql.table = `${escapeId(transformToDb(table))} (${keys.map((k) => escapeId(k)).join(",")}) VALUES`;
+                sql.values = dbValues.map((value) => {
                     const arr = new Array(keys.length);
                     Object.keys(value).forEach((k) => {
                         arr[keys.indexOf(k)] = value[k];
@@ -136,14 +138,14 @@ export function insertInto(table, exec: (sql, resolve, reject) => void) {
 
 export function deleteFrom(table: string, exec: (sql, resolve, reject) => void) {
     const sql: any = {
-        deleteFrom: `DELETE FROM ${escapeId(table)}`,
+        deleteFrom: `DELETE FROM ${escapeId(transformToDb(table))}`,
     };
     return new TriggerPromise(
         (resolve, reject) => {
             exec(joinSql([sql.deleteFrom, sql.where, sql.limit, sql.offset]), resolve, reject);
         }, {
             where(...args) {
-                sql.where = buildWhere(...args);
+                sql.where = buildWhere(...transformToDb(args));
                 return this;
             },
             limit(num) {
@@ -159,18 +161,18 @@ export function deleteFrom(table: string, exec: (sql, resolve, reject) => void) 
 
 export function update(table: string, exec: (sql, resolve, reject) => void) {
     const sql: any = {
-        update: `UPDATE ${escapeId(table)}`,
+        update: `UPDATE ${escapeId(transformToDb(table))}`,
     };
     return new TriggerPromise(
         (resolve, reject) => {
             exec(joinSql([sql.update, sql.set, sql.where]), resolve, reject);
         }, {
             where(...args) {
-                sql.where = buildWhere(...args);
+                sql.where = buildWhere(...transformToDb(args));
                 return this;
             },
             set(value) {
-                sql.set = `SET ${escape(value)}`;
+                sql.set = `SET ${escape(transformToDb(value))}`;
                 return this;
             },
         }) as IUpdate;
