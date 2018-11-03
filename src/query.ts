@@ -18,14 +18,14 @@ export interface ICount extends Promise<number> {
     where(...condictions: object[]): ICount;
 }
 
-export interface ISelect extends Promise<object[]> {
-    from(table: string): ISelect;
-    where(condiction: string): ISelect;
-    where(...condictions: object[]): ISelect;
-    groupBy(column: string): ISelect;
-    orderBy(...orders: Array<[string, number]>): ISelect;
-    limit(limit: number): ISelect;
-    offset(offset: number): ISelect;
+export interface ISelect<T> extends Promise<T[]> {
+    from(table: string): ISelect<T>;
+    where(condiction: string): ISelect<T>;
+    where(...condictions: object[]): ISelect<T>;
+    groupBy(column: string): ISelect<T>;
+    orderBy(...orders: Array<[string, number]>): ISelect<T>;
+    limit(limit: number): ISelect<T>;
+    offset(offset: number): ISelect<T>;
 
 }
 
@@ -48,7 +48,7 @@ export interface IUpdate extends Promise<IResult> {
 
 
 
-export function select(columns: string[] | string, exec: (sql, resolve, reject) => void) {
+export function select<T>(columns: string[] | string, exec: (sql, resolve, reject) => void) {
     const sql: any = {
         select: 'SELECT',
     };
@@ -86,7 +86,7 @@ export function select(columns: string[] | string, exec: (sql, resolve, reject) 
                 sql.offset = buildOffset(num);
                 return this;
             },
-        }) as ISelect;
+        }) as ISelect<T>;
 }
 
 export function count(table: string, exec: (sql, resolve, reject) => void) {

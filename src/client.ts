@@ -25,8 +25,8 @@ export class Client {
      * Select rows.
      * @param columns Columns to select.
      */
-    public select(columns: string[] | string) {
-        return select(columns, createExecutor(this.db));
+    public select<T>(columns: string[] | string) {
+        return select<T>(columns, createExecutor(this.db));
     }
     /**
      * Insert values into table.
