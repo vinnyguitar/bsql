@@ -1,7 +1,8 @@
-import { escape, escapeId } from "mysql";
+import { escape, escapeId, format } from "mysql";
 import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, joinSql, buildWhere } from "./builder";
 import TriggerPromise from "./trigger_promise";
 import { transformToDb } from './case_transform';
+import { Column } from "index";
 
 export interface IResult {
     fieldCount: number;
@@ -44,6 +45,7 @@ export interface IUpdate extends Promise<IResult> {
     where(condiction: string): IUpdate;
     where(...condictions: object[]): IUpdate;
     set(value: object): IUpdate;
+    set(values: object[], by): IUpdate
 }
 
 
@@ -171,8 +173,26 @@ export function update(table: string, exec: (sql, resolve, reject) => void) {
                 sql.where = buildWhere(...transformToDb(args));
                 return this;
             },
-            set(value) {
-                sql.set = `SET ${escape(transformToDb(value))}`;
+            set(value, by) {
+                if (value instanceof Array) {
+                    const lines = [];
+                    const columns = new Map<string, string[]>();
+                    value.forEach(v => {
+                        Object.keys(v).forEach(k => {
+                            if (k !== by) {
+                                const column = columns.get(k) || [];
+                                column.push(format(`WHEN ?? = ? THEN ?`, [by, v[by], v[k]]));
+                                columns.set(k, column);
+                            }
+                        });
+                    });
+                    columns.forEach((v, k) => {
+                        lines.push(`${escapeId(k)} = CASE ${v.join(' ')} ELSE ${escapeId(k)} END`);
+                    });
+                    sql.set = `SET ${lines.join(' , ')}`;
+                } else {
+                    sql.set = `SET ${escape(transformToDb(value))}`;
+                }
                 return this;
             },
         }) as IUpdate;

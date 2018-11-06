@@ -1,6 +1,6 @@
 {
   "name": "bsql",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "scripts": {
     "start": "ts-node",
     "prepare": "tsc",
