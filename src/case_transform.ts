@@ -1,5 +1,4 @@
-import * as Case from 'case';
-import { getConfig } from './config';
+import { getConfig } from "./config";
 
 const config = getConfig();
 
@@ -12,23 +11,24 @@ export function transformToEntity(value: any) {
 }
 
 export function camelCase(value: any) {
-    return transform(value, Case.camel);
+    return transform(value, (str) => str.replace(/_([a-z])/g, ($1, $2) => $2.toUpperCase()));
 }
 
 export function snakeCase(value: any) {
-    return transform(value, Case.snake);
+    return transform(value, (str) => str.replace(/^[A-Z]/, ($1) => $1.toLowerCase())
+        .replace(/[A-Z][a-z]/g, ($1) => "_" + $1.toLowerCase()));
 }
 
 function transform(value: any, func) {
     const type = typeof value;
-    if (type === 'string') {
+    if (type === "string") {
         return func(value);
-    } else if (type === 'object') {
+    } else if (type === "object") {
         if (value instanceof Array) {
-            return value.map(v => transform(v, func));
+            return value.map((v) => transform(v, func));
         } else {
             const tmp = {};
-            Object.keys(value).forEach(k => {
+            Object.keys(value).forEach((k) => {
                 tmp[func(k)] = value[k];
             });
             return tmp;

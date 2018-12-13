@@ -1,8 +1,8 @@
-import { escape, escapeId, format } from "mysql";
-import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, joinSql, buildWhere } from "./builder";
-import TriggerPromise from "./trigger_promise";
-import { transformToDb } from './case_transform';
 import { Column } from "index";
+import { escape, escapeId, format } from "mysql";
+import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, buildWhere, joinSql } from "./builder";
+import { transformToDb } from "./case_transform";
+import TriggerPromise from "./trigger_promise";
 
 export interface IResult {
     fieldCount: number;
@@ -45,14 +45,12 @@ export interface IUpdate extends Promise<IResult> {
     where(condiction: string): IUpdate;
     where(...condictions: object[]): IUpdate;
     set(value: object): IUpdate;
-    set(values: object[], by): IUpdate
+    set(values: object[], by): IUpdate;
 }
-
-
 
 export function select<T>(columns: string[] | string, exec: (sql, resolve, reject) => void) {
     const sql: any = {
-        select: 'SELECT',
+        select: "SELECT",
     };
     if (columns instanceof Array) {
         sql.columns = transformToDb(columns).map((c) => escapeId(c)).join(", ");
@@ -177,8 +175,8 @@ export function update(table: string, exec: (sql, resolve, reject) => void) {
                 if (value instanceof Array) {
                     const lines = [];
                     const columns = new Map<string, string[]>();
-                    value.forEach(v => {
-                        Object.keys(v).forEach(k => {
+                    value.forEach((v) => {
+                        Object.keys(v).forEach((k) => {
                             if (k !== by) {
                                 const column = columns.get(k) || [];
                                 column.push(format(`WHEN ?? = ? THEN ?`, [by, v[by], v[k]]));
@@ -187,9 +185,9 @@ export function update(table: string, exec: (sql, resolve, reject) => void) {
                         });
                     });
                     columns.forEach((v, k) => {
-                        lines.push(`${escapeId(k)} = CASE ${v.join(' ')} ELSE ${escapeId(k)} END`);
+                        lines.push(`${escapeId(k)} = CASE ${v.join(" ")} ELSE ${escapeId(k)} END`);
                     });
-                    sql.set = `SET ${lines.join(' , ')}`;
+                    sql.set = `SET ${lines.join(" , ")}`;
                 } else {
                     sql.set = `SET ${escape(transformToDb(value))}`;
                 }

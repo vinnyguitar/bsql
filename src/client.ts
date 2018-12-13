@@ -1,5 +1,5 @@
+import { transformToEntity } from "./case_transform";
 import { count, deleteFrom, insertInto, select, update } from "./query";
-import { transformToEntity } from './case_transform';
 
 /**
  * Database connection client.
