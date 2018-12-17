@@ -24,7 +24,8 @@ function parseConditionObject(condition) {
             let [opr] = Object.keys(value).filter((k) => map.has(k));
             if (opr) {
                 let resultValue = escape(value[opr]);
-                if (opr === "$in" || opr === "$notIn") {
+                if ((opr === "$in" || opr === "$notIn")) {
+                    if (!resultValue) { return ""; }
                     resultValue = `(${resultValue})`;
                 } else if (opr === "$isNull") {
                     if (resultValue === "false") {
@@ -55,6 +56,7 @@ export function buildWhere(...args) {
                 }
             })
             .filter((x) => !!x);
+        if (!ors.length) { return ""; }
         return "WHERE " + ors.join(" OR ");
     }
 

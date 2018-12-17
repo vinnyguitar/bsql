@@ -19,6 +19,7 @@ describe("test builder", () => {
         expect(buildWhere({ a: { $notLike: "abc%" } })).toBe("WHERE `a` NOT LIKE 'abc%'");
         expect(buildWhere({ a: { $isNull: true } })).toBe("WHERE `a` IS NULL");
         expect(buildWhere({ a: { $isNull: false } })).toBe("WHERE `a` IS NOT NULL");
+        expect(buildWhere({ a: { $in: [] } })).toBe("");
     });
 
     test("buildLimit", () => {
