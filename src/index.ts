@@ -1,19 +1,17 @@
-import * as mysql from "mysql";
-import { Client } from "./client";
-import { Column, Entity } from "./entity";
-import { config } from './config';
-
-export {
-    Column,
-    Entity,
-    Client as BsqlClient,
-    config,
-};
+import * as mysql from 'mysql';
+import { Client } from './client';
+import { Transaction } from './transaction';
 
 export const escape = mysql.escape;
 export const escapeId = mysql.escapeId;
 
-export function connect(config) {
+export class Bsql extends Client {
+    public beginTransaction() {
+        return new Transaction(this.db);
+    }
+}
+
+export default function bsql(config) {
     const db = mysql.createPool(config);
-    return new Client(db);
+    return new Bsql(db);
 }

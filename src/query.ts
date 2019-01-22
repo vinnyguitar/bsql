@@ -1,8 +1,7 @@
-import { Column } from "index";
 import { escape, escapeId, format } from "mysql";
 import { buildGroupBy, buildLimit, buildOffset, buildOrderBy, buildWhere, joinSql } from "./builder";
 import { transformToDb } from "./case_transform";
-import TriggerPromise from "./trigger_promise";
+import {TriggerPromise} from "./trigger_promise";
 
 export interface IResult {
     fieldCount: number;

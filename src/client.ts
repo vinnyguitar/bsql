@@ -1,72 +1,64 @@
-import { transformToEntity } from "./case_transform";
-import { count, deleteFrom, insertInto, select, update } from "./query";
+import { Connection, Pool } from 'mysql';
+import { QueryBatch } from './query_batch';
+import { QueryDelete } from './query_delete';
+import { QueryInsert } from './query_insert';
+import { QuerySelect } from './query_select';
+import { QueryUpdate } from './query_update';
 
 /**
- * Database connection client.
+ * Db client.
  */
 export class Client {
-    constructor(private readonly db) { }
-    /**
-     * Count rows.
-     * @param table Table name;
-     */
-    public count(table: string) {
-        return count(table, (sql, resolve, reject) => {
-            this.db.query(sql, (err, results) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(results[0].count);
-                }
-            });
-        });
-    }
+    constructor(protected readonly db: Connection | Pool) { }
+
     /**
      * Select rows.
-     * @param columns Columns to select.
+     * @param args Columns to select.
      */
-    public select<T>(columns: string[] | string) {
-        return select<T>(columns, createExecutor(this.db));
+    public select<T = any>(...args: string[]) {
+        return new QuerySelect<T>(this.db, args);
     }
+
     /**
      * Insert values into table.
-     * @param table Table name.
+     * @param values Values to insert.
      */
-    public insertInto(table: string) {
-        return insertInto(table, createExecutor(this.db));
+    public insert(values: any) {
+        return new QueryInsert(this.db, values);
     }
+
     /**
      * Delete values from table.
-     * @param table Table name.
+     * @param filter Delete filter.
      */
-    public deleteFrom(table: string) {
-        return deleteFrom(table, createExecutor(this.db));
+    public delete(filter: any) {
+        return new QueryDelete(this.db, filter);
     }
+
     /**
-     * Update values for table.
+     * Update values of table.
      * @param table Table name.
      */
     public update(table: string) {
-        return update(table, createExecutor(this.db));
-    }
-    /**
-     *  Terminating a connection gracefully.
-     */
-    public end() {
-        return new Promise((resolve, reject) => {
-            this.db.end((err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-        });
+        return new QueryUpdate(this.db, table);
     }
 
-    public query(sql, values?) {
+    /**
+     * Batch update values.
+     * @param table Table name.
+     */
+    public batch(table: string) {
+        return new QueryBatch(this.db, table);
+    }
+
+    /**
+     * Execute sql.
+     * @param sql
+     * @param args
+     */
+    public query(sql, ...args) {
         return new Promise((resolve, reject) => {
-            this.db.query(sql, values, (err, results) => {
+            this.db.query(sql, ...args, (err, results) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -75,16 +67,4 @@ export class Client {
             });
         });
     }
-}
-
-function createExecutor(db) {
-    return (sql, resolve, reject) => {
-        db.query(sql, (err, results) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(transformToEntity(results));
-            }
-        });
-    };
 }
