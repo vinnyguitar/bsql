@@ -12,4 +12,7 @@ export class QueryInsert<T> extends Query<any> {
     public onDuplicateKey(sql: string) {
         return this;
     }
+    protected getSql() {
+        return '';
+    }
 }

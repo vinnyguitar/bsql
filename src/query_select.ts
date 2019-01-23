@@ -10,9 +10,6 @@ enum OrderType {
 }
 
 export class QuerySelect<T> extends Query<T> {
-    constructor() {
-        super();
-    }
     public select(...columns: string[]) {
         return this;
     }
@@ -37,9 +34,7 @@ export class QuerySelect<T> extends Query<T> {
     public offset(num: number) {
         return this;
     }
-    protected execute(resolve, reject) {
-        const sql = '';
-        // this.query(sql, sdf);
-        return this;
+    protected getSql() {
+        return '';
     }
 }

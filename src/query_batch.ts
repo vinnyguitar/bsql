@@ -9,4 +9,7 @@ export class QueryBatch<T> extends Query<any> {
     public from() {
         //
     }
+    protected getSql() {
+        return '';
+    }
 }

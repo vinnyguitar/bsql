@@ -6,16 +6,16 @@ import { QuerySelect } from 'query_select';
 import { QueryUpdate } from 'query_update';
 
 /**
- * Db Connection.
+ * Db Client.
  */
-export abstract class Connection {
-    constructor(protected readonly db: Pool) { }
+export class Client {
+    constructor(protected readonly query) { }
     /**
      * Select rows.
      * @param columns Columns to select.
      */
     public select<T = any>(...columns: string[]) {
-        const select = new QuerySelect<T>(this.executor);
+        const select = new QuerySelect<T>(this.query);
         return select.select(...columns);
     }
     /**
@@ -23,7 +23,7 @@ export abstract class Connection {
      * @param column Column name default *.
      */
     public count(column: string = '*') {
-        const select = new QuerySelect<number>(this.db);
+        const select = new QuerySelect<number>(this.query);
         return select.select(`count(${column})`);
     }
 
@@ -32,7 +32,7 @@ export abstract class Connection {
      * @param values Values to insert.
      */
     public insert(values: any) {
-        const insert = new QueryInsert(this.db);
+        const insert = new QueryInsert(this.query);
         return insert.values(values);
     }
 
@@ -41,7 +41,7 @@ export abstract class Connection {
      * @param filter Delete filter.
      */
     public delete(filter: any) {
-        const del = new QueryDelete(this.db);
+        const del = new QueryDelete(this.query);
         return del.where(filter);
     }
 
@@ -50,7 +50,7 @@ export abstract class Connection {
      * @param table Table name.
      */
     public update(table: string) {
-        const update = new QueryUpdate(this.db);
+        const update = new QueryUpdate(this.query);
         return update.update(table);
     }
 
@@ -59,8 +59,6 @@ export abstract class Connection {
      * @param table Table name.
      */
     public batch(table: string) {
-        return new QueryBatch(this.db, table);
+        return new QueryBatch(this.query, table);
     }
-
-    public abstract executor(resolve: (value?) => void, reject: (reason?: any) => void): void;
 }

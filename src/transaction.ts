@@ -1,13 +1,14 @@
 import { MysqlError, PoolConnection } from 'mysql';
-import { Connection } from 'client';
+import { Client } from './client';
 
-export class Transaction extends Connection {
+export class Transaction extends Client {
     constructor(private readonly connection: PoolConnection) {
         super(connection);
     }
     public commit() {
         return new Promise((resolve, reject) => {
             this.connection.commit((err: MysqlError) => {
+                this.connection.release();
                 err ? reject(err) : resolve();
             });
         });
@@ -17,9 +18,5 @@ export class Transaction extends Connection {
         return new Promise((resolve) => {
             this.connection.commit(() => resolve());
         });
-    }
-
-    public executor(resolve, reject) {
-        //
     }
 }

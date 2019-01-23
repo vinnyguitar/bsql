@@ -10,4 +10,7 @@ export class QueryUpdate<T> extends Query<any> {
     public where(filter: any) {
         //
     }
+    protected getSql() {
+        return '';
+    }
 }
