@@ -1,12 +1,9 @@
-import { BsqlQuery } from 'bsql_query';
-export class QueryDelete<T> extends BsqlQuery<any> {
-    constructor(db: any, private readonly filter: any) {
-        super(db);
-    }
-    public count() {
+import { Query } from 'query';
+export class QueryDelete<T> extends Query<any> {
+    public from(table: string) {
         //
     }
-    public from() {
+    public where(filter: any) {
         //
     }
 }

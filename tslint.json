@@ -8,6 +8,14 @@
         "quotemark": [
             true,
             "single"
+        ],
+        "max-classes-per-file": [
+            false,
+            1
+        ],
+        "interface-name": [
+            true,
+            "never-prefix"
         ]
     },
     "rulesDirectory": []

@@ -1,12 +1,13 @@
-import { BsqlQuery } from 'bsql_query';
-export class QueryUpdate<T> extends BsqlQuery<any> {
-    constructor(db: any, private readonly table: string) {
-        super(db);
-    }
-    public count() {
+import { Query } from 'query';
+
+export class QueryUpdate<T> extends Query<any> {
+    public update(table: string) {
         //
     }
-    public from() {
+    public set(value: any) {
+        //
+    }
+    public where(filter: any) {
         //
     }
 }

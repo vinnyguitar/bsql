@@ -1,5 +1,5 @@
-import { BsqlQuery } from 'bsql_query';
-export class QueryBatch<T> extends BsqlQuery<any> {
+import { Query } from 'query';
+export class QueryBatch<T> extends Query<any> {
     constructor(db: any, private readonly table: string) {
         super(db);
     }

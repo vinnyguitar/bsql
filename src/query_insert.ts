@@ -1,12 +1,15 @@
-import { BsqlQuery } from 'bsql_query';
-export class QueryInsert<T> extends BsqlQuery<any> {
-    constructor(db: any, private readonly columns: string[]) {
-        super(db);
+import { Query } from 'query';
+export class QueryInsert<T> extends Query<any> {
+    public insert() {
+        return this;
     }
-    public count() {
-        //
+    public into(table: string) {
+        return this;
     }
-    public from() {
-        //
+    public values(values: any[]) {
+        return this;
+    }
+    public onDuplicateKey(sql: string) {
+        return this;
     }
 }

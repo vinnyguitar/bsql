@@ -1,13 +1,24 @@
 import * as mysql from 'mysql';
-import { Client } from './client';
+import { Connection } from 'client';
 import { Transaction } from './transaction';
 
 export const escape = mysql.escape;
 export const escapeId = mysql.escapeId;
 
-export class Bsql extends Client {
-    public beginTransaction() {
-        return new Transaction(this.db);
+export class Bsql extends Connection {
+    constructor(private readonly pool: mysql.Pool) {
+        super(pool);
+    }
+    public async beginTransaction() {
+        return new Promise<Connection>((resolve, reject) => {
+            this.pool.getConnection((err: mysql.MysqlError, connection: mysql.Connection) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(new Transaction(connection));
+                }
+            });
+        });
     }
 }
 

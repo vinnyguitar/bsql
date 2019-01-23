@@ -1,22 +1,30 @@
-import { Connection, Pool } from 'mysql';
-import { QueryBatch } from './query_batch';
-import { QueryDelete } from './query_delete';
-import { QueryInsert } from './query_insert';
-import { QuerySelect } from './query_select';
-import { QueryUpdate } from './query_update';
+import { Pool } from 'mysql';
+import { QueryBatch } from 'query_batch';
+import { QueryDelete } from 'query_delete';
+import { QueryInsert } from 'query_insert';
+import { QuerySelect } from 'query_select';
+import { QueryUpdate } from 'query_update';
 
 /**
- * Db client.
+ * Db Connection.
  */
-export class Client {
-    constructor(protected readonly db: Connection | Pool) { }
-
+export abstract class Connection {
+    constructor(protected readonly db: Pool) { }
     /**
      * Select rows.
-     * @param args Columns to select.
+     * @param columns Columns to select.
      */
-    public select<T = any>(...args: string[]) {
-        return new QuerySelect<T>(this.db, args);
+    public select<T = any>(...columns: string[]) {
+        const select = new QuerySelect<T>(this.executor);
+        return select.select(...columns);
+    }
+    /**
+     * Count rows.
+     * @param column Column name default *.
+     */
+    public count(column: string = '*') {
+        const select = new QuerySelect<number>(this.db);
+        return select.select(`count(${column})`);
     }
 
     /**
@@ -24,7 +32,8 @@ export class Client {
      * @param values Values to insert.
      */
     public insert(values: any) {
-        return new QueryInsert(this.db, values);
+        const insert = new QueryInsert(this.db);
+        return insert.values(values);
     }
 
     /**
@@ -32,7 +41,8 @@ export class Client {
      * @param filter Delete filter.
      */
     public delete(filter: any) {
-        return new QueryDelete(this.db, filter);
+        const del = new QueryDelete(this.db);
+        return del.where(filter);
     }
 
     /**
@@ -40,7 +50,8 @@ export class Client {
      * @param table Table name.
      */
     public update(table: string) {
-        return new QueryUpdate(this.db, table);
+        const update = new QueryUpdate(this.db);
+        return update.update(table);
     }
 
     /**
@@ -51,20 +62,5 @@ export class Client {
         return new QueryBatch(this.db, table);
     }
 
-    /**
-     * Execute sql.
-     * @param sql
-     * @param args
-     */
-    public query(sql, ...args) {
-        return new Promise((resolve, reject) => {
-            this.db.query(sql, ...args, (err, results) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(results);
-                }
-            });
-        });
-    }
+    public abstract executor(resolve: (value?) => void, reject: (reason?: any) => void): void;
 }
