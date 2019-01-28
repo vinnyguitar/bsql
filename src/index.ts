@@ -7,7 +7,7 @@ export const escapeId = mysql.escapeId;
 
 export class Bsql extends Client {
     constructor(private readonly pool: mysql.Pool) {
-        super(pool.query);
+        super((...args: any[]) => pool.query.apply(pool, args));
     }
     public async beginTransaction() {
         return new Promise<Transaction>((resolve, reject) => {
@@ -22,7 +22,7 @@ export class Bsql extends Client {
     }
 }
 
-export default function bsql(config) {
+export default function bsql(config: mysql.PoolConfig): Bsql {
     const db = mysql.createPool(config);
     return new Bsql(db);
 }

@@ -3,6 +3,7 @@
  */
 export abstract class Query<T> implements Promise<T> {
     public readonly [Symbol.toStringTag] = 'Promise';
+    protected sql: any = {};
     private promise: Promise<T>;
     private readonly plugins = [];
     constructor(private readonly query: (sql: string, cb) => void) {
