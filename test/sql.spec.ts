@@ -18,6 +18,7 @@ describe('query test', () => {
             password: 'bsql_test',
             port: 63841,
             user: 'bsql_test',
+            // debug: ['ComQueryPacket'],
         });
     });
 
@@ -59,7 +60,7 @@ describe('query test', () => {
     });
 
     test('count', async () => {
-        const count = await db.count().where({ zipCode: 22 });
+        const count = await db.count().from('user').where({ zipCode: 22 });
         expect(count).toBe(2);
     });
 

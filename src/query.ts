@@ -44,14 +44,14 @@ export abstract class Query<T> implements Promise<T> {
     /**
      * 获取sql，子类实现具体逻辑
      */
-    protected abstract getSql(): string;
+    protected abstract getSql(): string[];
     /**
      * 子类实现具体触发后逻辑
      * @param resolve 通过回调
      * @param reject 拒绝回调
      */
     private execute(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) {
-        this.query(this.getSql(), (err, results) => {
+        this.query(this.getSql().filter((x) => !!x).join(' ') + ';', (err, results) => {
             if (err) {
                 reject(err);
             } else {

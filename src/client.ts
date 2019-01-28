@@ -24,7 +24,8 @@ export class Client {
      */
     public count(column: string = '*') {
         const select = new QuerySelect<number>(this.query);
-        return select.select(`count(${column})`);
+        select.plugin((result) => result[0].count);
+        return select.select(`COUNT(${column}) AS count`);
     }
 
     /**

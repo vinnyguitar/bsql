@@ -11,6 +11,6 @@ export class QueryUpdate<T> extends Query<any> {
         //
     }
     protected getSql() {
-        return '';
+        return [];
     }
 }

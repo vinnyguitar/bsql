@@ -10,6 +10,6 @@ export class QueryBatch<T> extends Query<any> {
         //
     }
     protected getSql() {
-        return '';
+        return [];
     }
 }

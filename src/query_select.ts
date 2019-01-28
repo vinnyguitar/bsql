@@ -20,11 +20,18 @@ export class QuerySelect<T> extends Query<T[]> {
     }
 
     public select(...columns: string[]) {
-        if (!columns) {
+        if (!columns || columns[0] === '*') {
             this.sql.select = 'SELECT *';
         } else {
-            const formatted = snakeCase(columns);
-            this.sql.select = `SELECT ${formatted.map(escapeId).join(',')}`;
+            const formatted = columns.map((c) => {
+                const match = /^(\w+)\((.+)\)(.*)/.exec(c);
+                if (!match) {
+                    return escapeId(snakeCase(c));
+                } else {
+                    return `${match[1]}(${match[2] === '*' ? '*' : escapeId(snakeCase(match[2]))})${match[3] || ''}`;
+                }
+            });
+            this.sql.select = `SELECT ${formatted.join(',')}`;
         }
         return this;
     }
@@ -33,7 +40,7 @@ export class QuerySelect<T> extends Query<T[]> {
         return this;
     }
     public where(filter: WhereFilter) {
-        this.sql.where = buildWhereSql(filter);
+        this.sql.where = `WHERE ${buildWhereSql(filter)}`;
         return this;
     }
     public groupBy(column: string) {
@@ -52,6 +59,6 @@ export class QuerySelect<T> extends Query<T[]> {
         return this;
     }
     protected getSql() {
-        return [this.sql.select, this.sql.from, this.sql.where].join(' ');
+        return [this.sql.select, this.sql.from, this.sql.where];
     }
 }

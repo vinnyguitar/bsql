@@ -35,6 +35,7 @@ function buildOpr(key: string, opr: WhereOpr) {
     let right: string;
     if (type === 'number' || type === 'string' || type === 'boolean') {
         operator = '=';
+        right = escape(opr);
     } else if (type === 'object') {
         if ('$gt' in opr) {
             operator = '>';
@@ -66,6 +67,6 @@ function buildOpr(key: string, opr: WhereOpr) {
         } else if ('$isNull' in opr) {
             operator = opr.$isNull ? 'IS NULL' : 'IS NOT NULL';
         }
-        return [left, operator, right].filter((y) => !!y).join(' ');
     }
+    return [left, operator, right].filter((y) => !!y).join(' ');
 }

@@ -31,6 +31,6 @@ export class QueryInsert extends Query<MysqlResult> {
         return this;
     }
     protected getSql() {
-        return [this.sql.insert, this.sql.column, this.sql.values, this.sql.duplicate].join(' ');
+        return [this.sql.insert, this.sql.column, this.sql.values, this.sql.duplicate];
     }
 }

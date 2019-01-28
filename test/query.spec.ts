@@ -6,7 +6,7 @@ class TestQuery extends Query<string> {
     }
 
     protected getSql() {
-        return 'sql';
+        return ['sql'];
     }
 }
 
@@ -18,6 +18,6 @@ describe('query test', () => {
     });
 
     test('promise', async () => {
-        expect(await query).toBe('sql');
+        expect(await query).toBe('sql;');
     });
 });
