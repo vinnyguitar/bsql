@@ -20,7 +20,7 @@ export class QuerySelect<T> extends Query<T[]> {
     }
 
     public select(...columns: string[]) {
-        if (!columns || columns[0] === '*') {
+        if (!columns || !columns.length || columns[0] === '*') {
             this.sql.select = 'SELECT *';
         } else {
             const formatted = columns.map((c) => {

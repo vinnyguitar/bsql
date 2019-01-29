@@ -14,14 +14,14 @@ export interface WhereOpr {
 }
 
 export interface WhereFilter {
-    $or?: WhereOpr[];
-    [propName: string]: boolean | string | number | WhereOpr | WhereOpr[];
+    $or?: WhereFilter[];
+    [propName: string]: boolean | string | number | WhereOpr | WhereFilter[];
 }
 
 export function buildWhereSql(filter: WhereFilter) {
     return Object.keys(filter).map((key) => {
         if (key === '$or') {
-            return filter.$or.join(' OR ');
+            return filter.$or.map(buildWhereSql).join(' OR ');
         } else {
             return buildOpr(key, filter[key] as WhereOpr);
         }
@@ -60,10 +60,10 @@ function buildOpr(key: string, opr: WhereOpr) {
             right = escape(opr.$notLike);
         } else if ('$in' in opr) {
             operator = 'IN';
-            right = escape(opr.$in);
+            right = `(${escape(opr.$in)})`;
         } else if ('$notIn' in opr) {
             operator = 'NOT IN';
-            right = escape(opr.$notIn);
+            right = `(${escape(opr.$notIn)})`;
         } else if ('$isNull' in opr) {
             operator = opr.$isNull ? 'IS NULL' : 'IS NOT NULL';
         }
