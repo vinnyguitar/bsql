@@ -56,6 +56,7 @@ describe('query test', () => {
             zipCode: 22,
         }, {
             name: 'five',
+            zipCode: 22,
         }];
         const result = await db.insert(users).into('user');
         expect(result.affectedRows).toBe(users.length);
@@ -63,7 +64,7 @@ describe('query test', () => {
 
     test('count', async () => {
         const count = await db.count().from('user').where({ zipCode: 22 });
-        expect(count).toBe(2);
+        expect(count).toBe(3);
     });
 
     test('select all', async () => {
@@ -158,7 +159,19 @@ describe('query test', () => {
         const list = await db.select<TestUser>()
             .from('user')
             .where({ $or: [{ age: { $lt: 2 } }, { zipCode: 22 }] });
-        expect(list.length).toBe(3);
+        expect(list.length).toBe(4);
+        expect(list[0].name).toBe('one');
+    });
+
+    test('select group by', async () => {
+        const list = await db.select<TestUser>().from('user').groupBy('zipCode');
+        expect(list.length).toBe(2);
+        expect(list[1].name).toBe('three');
+    });
+
+    test('select group by having', async () => {
+        const list = await db.select<TestUser>().from('user').groupBy('zipCode').having({name: {$not: 'three'}});
+        expect(list.length).toBe(1);
         expect(list[0].name).toBe('one');
     });
 

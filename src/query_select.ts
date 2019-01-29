@@ -3,10 +3,6 @@ import { Query } from './query';
 import { camelCase, snakeCase } from './transform';
 import { buildWhereSql, WhereFilter } from './where_filter';
 
-interface Filter {
-    [propName: string]: any;
-}
-
 enum OrderType {
     Asc = 1,
     Desc = -1,
@@ -44,9 +40,11 @@ export class QuerySelect<T> extends Query<T[]> {
         return this;
     }
     public groupBy(column: string) {
+        this.sql.groupBy = `GROUP BY ${escapeId(snakeCase(column))}`;
         return this;
     }
-    public having(filter: Filter) {
+    public having(filter: WhereFilter) {
+        this.sql.having = `HAVING ${buildWhereSql(filter)}`;
         return this;
     }
     public orderBy(order: Array<[string, OrderType]>) {
@@ -59,6 +57,6 @@ export class QuerySelect<T> extends Query<T[]> {
         return this;
     }
     protected getSql() {
-        return [this.sql.select, this.sql.from, this.sql.where];
+        return [this.sql.select, this.sql.from, this.sql.where, this.sql.groupBy, this.sql.having];
     }
 }
