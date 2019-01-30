@@ -60,6 +60,7 @@ export class Client {
      * @param table Table name.
      */
     public batch(table: string) {
-        return new QueryBatch(this.query, table);
+        const batch = new QueryBatch(this.query);
+        return batch.batch(table);
     }
 }

@@ -207,4 +207,13 @@ describe('query test', () => {
         expect(first.name).toBe('one');
     });
 
+    test('batch update', async () => {
+        const users = await db.select<TestUser>('*').from('user');
+        users.forEach((u) => u.zipCode = 88);
+        const result = await db.batch('user').update(users);
+        expect(result.affectedRows).toBe(5);
+        const [first] = await db.select<TestUser>('*').from('user');
+        expect(first.zipCode).toBe(88);
+    });
+
 });

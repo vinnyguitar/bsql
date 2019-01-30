@@ -1,9 +1,10 @@
 import { escape, escapeId } from 'mysql';
+import { MysqlResult } from './mysql_result';
 import { Query } from './query';
 import { snakeCase } from './transform';
 import { buildWhereSql, WhereFilter } from './where_filter';
 
-export class QueryUpdate<T> extends Query<any> {
+export class QueryUpdate extends Query<MysqlResult> {
     public update(table: string) {
         this.sql.update = `UPDATE ${escapeId(table)}`;
         return this;
