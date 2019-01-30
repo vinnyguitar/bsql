@@ -27,7 +27,7 @@ export class QueryInsert extends Query<MysqlResult> {
         return this;
     }
     public onDuplicateKey(sql: string) {
-        this.sql.duplicate = sql;
+        this.sql.duplicate = `ON DUPLICATE KEY ${sql}`;
         return this;
     }
     protected getSql() {

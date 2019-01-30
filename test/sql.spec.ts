@@ -189,4 +189,15 @@ describe('query test', () => {
         expect(first.name).toBe('two');
     });
 
+    test('select on duplicate key', async () => {
+        const users = await db.select<TestUser>('*').from('user');
+        users.forEach((u) => u.name = `${u.name}_${u.address}`);
+        const result = await db.insert(users).into('user').onDuplicateKey('UPDATE name=VALUES(name)');
+        expect(result.changedRows).toBe(5);
+        const [first] = await db.select<TestUser>('*').from('user');
+        expect(first.name).toBe('one_a1');
+        const count = await db.count().from('user');
+        expect(count).toBe(5);
+    });
+
 });
