@@ -200,4 +200,11 @@ describe('query test', () => {
         expect(count).toBe(5);
     });
 
+    test('update', async () => {
+        const result = await db.update('user').set({ name: 'one' }).where({ name: 'one_a1' });
+        expect(result.affectedRows).toBe(1);
+        const [first] = await db.select<TestUser>('*').from('user');
+        expect(first.name).toBe('one');
+    });
+
 });
