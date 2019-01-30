@@ -170,9 +170,23 @@ describe('query test', () => {
     });
 
     test('select group by having', async () => {
-        const list = await db.select<TestUser>().from('user').groupBy('zipCode').having({name: {$not: 'three'}});
+        const list = await db.select<TestUser>().from('user').groupBy('zipCode').having({ name: { $not: 'three' } });
         expect(list.length).toBe(1);
         expect(list[0].name).toBe('one');
+    });
+
+    test('select order by', async () => {
+        const users = await db.select<TestUser>('*').from('user').orderBy(['age', -1], ['name', -1]);
+        expect(users.length).toBe(5);
+        const first = users[0];
+        expect(first.name).toBe('four');
+    });
+
+    test('select limit offset', async () => {
+        const users = await db.select<TestUser>('*').from('user').limit(2).offset(1);
+        expect(users.length).toBe(2);
+        const first = users[0];
+        expect(first.name).toBe('two');
     });
 
 });

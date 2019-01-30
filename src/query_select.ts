@@ -47,16 +47,21 @@ export class QuerySelect<T> extends Query<T[]> {
         this.sql.having = `HAVING ${buildWhereSql(filter)}`;
         return this;
     }
-    public orderBy(order: Array<[string, OrderType]>) {
+    public orderBy(...order: Array<[string, OrderType]>) {
+        this.sql.orderBy = 'ORDER BY '
+            + order.map(([k, v]) => `${escapeId(k)} ${v === OrderType.Asc ? 'ASC' : 'DESC'}`).join(',');
         return this;
     }
     public limit(num: number) {
+        this.sql.limit = `LIMIT ${escape(num)}`;
         return this;
     }
     public offset(num: number) {
+        this.sql.offset = `OFFSET ${escape(num)}`;
         return this;
     }
     protected getSql() {
-        return [this.sql.select, this.sql.from, this.sql.where, this.sql.groupBy, this.sql.having];
+        return [this.sql.select, this.sql.from, this.sql.where,
+        this.sql.groupBy, this.sql.having, this.sql.orderBy, this.sql.limit, this.sql.offset];
     }
 }
