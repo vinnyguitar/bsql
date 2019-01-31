@@ -216,4 +216,18 @@ describe('query test', () => {
         expect(first.zipCode).toBe(88);
     });
 
+    test('transaction', async () => {
+        let trans = await db.beginTransaction();
+        let result = await trans.insert([{ name: 'six' }]).into('user');
+        expect(result.affectedRows).toBe(1);
+        await trans.rollback();
+        let count = await db.count().from('user');
+        expect(count).toBe(5);
+        trans = await db.beginTransaction();
+        result = await trans.insert([{ name: 'six' }]).into('user');
+        await trans.commit();
+        count = await db.count().from('user');
+        expect(count).toBe(6);
+    });
+
 });

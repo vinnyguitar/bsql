@@ -15,7 +15,14 @@ export class Bsql extends Client {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(new Transaction(connection));
+                    connection.beginTransaction((e: mysql.MysqlError) => {
+                        if (e) {
+                            reject(e);
+                        } else {
+                            resolve(new Transaction(connection));
+                        }
+                    });
+
                 }
             });
         });
