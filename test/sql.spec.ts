@@ -230,4 +230,9 @@ describe('query test', () => {
         expect(count).toBe(6);
     });
 
+    test('query', async () => {
+        const result = await db.query('delete from user where name=?', ['six']);
+        expect(result.affectedRows).toBe(1);
+    });
+
 });
