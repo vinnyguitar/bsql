@@ -1,4 +1,5 @@
 import { escape, escapeId } from 'mysql';
+import { assert } from './bsql_error';
 import { MysqlResult } from './mysql_result';
 import { Query } from './query';
 import { snakeCase } from './transform';
@@ -18,6 +19,8 @@ export class QueryUpdate extends Query<MysqlResult> {
         return this;
     }
     protected getSql() {
+        assert(this.sql.set, 'Value is required, please call set(value).');
+        assert(this.sql.where, 'Filter is required, please call where(filter).');
         return [this.sql.update, this.sql.set, this.sql.where];
     }
 }

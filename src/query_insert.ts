@@ -1,4 +1,5 @@
 import { escape, escapeId } from 'mysql';
+import { assert } from './bsql_error';
 import { MysqlResult } from './mysql_result';
 import { Query } from './query';
 import { snakeCase } from './transform';
@@ -31,6 +32,8 @@ export class QueryInsert extends Query<MysqlResult> {
         return this;
     }
     protected getSql() {
+        assert(this.sql.insert, 'Table name is required, please call into(table).');
+        assert(this.sql.column, 'Values is required, please call values(values).');
         return [this.sql.insert, this.sql.column, this.sql.values, this.sql.duplicate];
     }
 }

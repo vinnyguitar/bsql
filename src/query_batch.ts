@@ -1,4 +1,5 @@
 import { escapeId, format } from 'mysql';
+import { assert } from './bsql_error';
 import { MysqlResult } from './mysql_result';
 import { Query } from './query';
 import { snakeCase } from './transform';
@@ -28,6 +29,8 @@ export class QueryBatch extends Query<MysqlResult> {
     }
 
     protected getSql() {
+        assert(this.sql.update, 'Table name is required, please call batch(table).');
+        assert(this.sql.set, 'Values is required, please call update(values).');
         return [this.sql.update, this.sql.set];
     }
 }

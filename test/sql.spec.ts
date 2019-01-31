@@ -235,4 +235,25 @@ describe('query test', () => {
         expect(result.affectedRows).toBe(1);
     });
 
+    test('batch assert', async () => {
+        expect(() => db.batch('table').then).toThrowError('Values is required, please call update(values).');
+    });
+
+    test('delete assert', async () => {
+        expect(() => db.delete({}).then).toThrowError('Table name is required, please call from(table).');
+    });
+
+    test('insert assert', async () => {
+        expect(() => db.insert([]).then).toThrowError('Table name is required, please call into(table).');
+    });
+
+    test('select assert', async () => {
+        expect(() => db.select().then).toThrowError('Table name is required, please call from(table).');
+    });
+
+    test('update assert', async () => {
+        expect(() => db.update('table').then).toThrowError('Value is required, please call set(value).');
+        expect(() => db.update('table').set({}).then).toThrowError('Filter is required, please call where(filter).');
+    });
+
 });

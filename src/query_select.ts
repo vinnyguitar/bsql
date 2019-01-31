@@ -1,4 +1,5 @@
 import { escape, escapeId } from 'mysql';
+import { assert } from './bsql_error';
 import { Query } from './query';
 import { camelCase, snakeCase } from './transform';
 import { buildWhereSql, WhereFilter } from './where_filter';
@@ -61,6 +62,7 @@ export class QuerySelect<T> extends Query<T[]> {
         return this;
     }
     protected getSql() {
+        assert(this.sql.from, 'Table name is required, please call from(table).');
         return [this.sql.select, this.sql.from, this.sql.where,
         this.sql.groupBy, this.sql.having, this.sql.orderBy, this.sql.limit, this.sql.offset];
     }
