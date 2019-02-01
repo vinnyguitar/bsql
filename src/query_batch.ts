@@ -5,14 +5,17 @@ import { Query } from './query';
 import { snakeCase } from './transform';
 export class QueryBatch extends Query<MysqlResult> {
     public batch(table: string) {
+        assert(typeof table === 'string' && table, `Parameter table expected an not empty string, but get: ${table}.`);
         this.sql.update = `UPDATE ${table}`;
         return this;
     }
 
-    public update(rows: Array<{}>, matchColumn: string = 'id') {
+    public update(values: Array<{}>, matchColumn: string = 'id') {
+        assert(Object.prototype.toString.call(values) === '[object Array]' && values.length,
+            `Parameter values expected an not empty array, but get: ${values}.`);
         const lines = [];
         const columns = new Map<string, string[]>();
-        snakeCase(rows).forEach((v) => {
+        snakeCase(values).forEach((v) => {
             Object.keys(v).forEach((k) => {
                 if (k !== matchColumn) {
                     const column = columns.get(k) || [];

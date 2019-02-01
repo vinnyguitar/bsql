@@ -33,6 +33,7 @@ export class QuerySelect<T> extends Query<T[]> {
         return this;
     }
     public from(table: string) {
+        assert(typeof table === 'string' && table, `Parameter table expected an not empty string, but get: ${table}.`);
         this.sql.from = `FROM ${escapeId(table)}`;
         return this;
     }

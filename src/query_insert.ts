@@ -5,10 +5,13 @@ import { Query } from './query';
 import { snakeCase } from './transform';
 export class QueryInsert extends Query<MysqlResult> {
     public into(table: string) {
+        assert(typeof table === 'string' && table, `Parameter table expected an not empty string, but get: ${table}.`);
         this.sql.insert = `INSERT INTO ${escapeId(table)}`;
         return this;
     }
     public values(values: any[]) {
+        assert(Object.prototype.toString.call(values) === '[object Array]' && values.length,
+            `Parameter values expected an not empty array, but get: ${values}.`);
         const formatted = snakeCase(values);
         const keys = [];
         formatted.forEach((value: {}) => Object.keys(value).forEach((k) => {

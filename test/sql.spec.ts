@@ -18,7 +18,7 @@ describe('query test', () => {
             password: 'bsql_test',
             port: 63841,
             user: 'bsql_test',
-            debug: ['ComQueryPacket'],
+            // debug: ['ComQueryPacket'],
         });
     });
 
@@ -244,7 +244,7 @@ describe('query test', () => {
     });
 
     test('insert assert', async () => {
-        expect(() => db.insert([]).then).toThrowError('Table name is required, please call into(table).');
+        expect(() => db.insert([{}]).then).toThrowError('Table name is required, please call into(table).');
     });
 
     test('select assert', async () => {
@@ -254,6 +254,38 @@ describe('query test', () => {
     test('update assert', async () => {
         expect(() => db.update('table').then).toThrowError('Value is required, please call set(value).');
         expect(() => db.update('table').set({}).then).toThrowError('Filter is required, please call where(filter).');
+    });
+
+    test('assert batch param', async () => {
+        expect(() => db.batch(null)).toThrowError('Parameter table expected an not empty string, but get: null.');
+        expect(() => db.batch('table').update(undefined))
+            .toThrowError('Parameter values expected an not empty array, but get: undefined.');
+    });
+
+    test('assert delete param', async () => {
+        expect(() => db.delete(null)).toThrowError('Parameter table expected an not empty object, but get: null.');
+        expect(() => db.delete({}).from(undefined))
+            .toThrowError('Parameter table expected an not empty string, but get: undefined.');
+    });
+
+    test('assert insert param', async () => {
+        expect(() => db.insert([{}]).into(null))
+            .toThrowError('Parameter table expected an not empty string, but get: null.');
+        expect(() => db.insert(undefined).into('table'))
+            .toThrowError('Parameter values expected an not empty array, but get: undefined.');
+    });
+
+    test('assert select param', async () => {
+        expect(() => db.select().from(null))
+            .toThrowError('Parameter table expected an not empty string, but get: null.');
+    });
+
+    test('assert update param', async () => {
+        expect(() => db.update(null)).toThrowError('Parameter table expected an not empty string, but get: null.');
+        expect(() => db.update('table').set(undefined))
+            .toThrowError('Parameter value expected an not empty object, but get: undefined.');
+        expect(() => db.update('table').set({}).where(null))
+            .toThrowError('Parameter filter expected an not empty object, but get: null.');
     });
 
 });
