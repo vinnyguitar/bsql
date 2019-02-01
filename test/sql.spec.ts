@@ -63,7 +63,7 @@ describe('query test', () => {
     });
 
     test('count', async () => {
-        const count = await db.count().from('user').where({ zipCode: 22 });
+        const count = await db.count({ zipCode: 22 }).from('user');
         expect(count).toBe(3);
     });
 

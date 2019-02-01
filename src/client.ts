@@ -23,10 +23,13 @@ export class Client {
      * Count rows.
      * @param column Column name default *.
      */
-    public count(column: string = '*') {
+    public count(filter?: WhereFilter) {
         const select = new QuerySelect<number>(this.queryFn);
         select.plugin((result) => result[0].count);
-        return select.select(`COUNT(${column}) AS count`);
+        if (filter) {
+            select.where(filter);
+        }
+        return select.select(`COUNT(*) AS count`);
     }
 
     /**

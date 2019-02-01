@@ -77,7 +77,7 @@ db.select().from('user').limit(20).offset(19); // SELECT * FROM `user` LIMIT 20 
 
 ### 计数
 ```js
-db.count().from('user').where({age: {$gt: 20}}); // SELECT COUNT(*) as count FROM `user` WHERE `age` > 20;
+db.count({age: {$gt: 20}}).from('user'); // SELECT COUNT(*) as count FROM `user` WHERE `age` > 20;
 ```
 
 ### 新增
