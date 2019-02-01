@@ -48,7 +48,7 @@ db.select().from('user').where({name: 'lili', age: 20}); // SELECT * FROM `user`
 db.select().from('user').where({$or: [{name: 'lili'}, {age: 20}]}); // SELECT * FROM `user` WHERE `name` = 'lili' OR `age` = 20;
 
 // 比较 $gt(>) $gte(>=) $lt(<) $lte(<=) $not(<>)
-db.select().from('user').where({age: {$gt: 30}});// SELECT * FROM `user` WHERE age > 30;
+db.select().from('user').where({age: {$gt: 30}}); // SELECT * FROM `user` WHERE age > 30;
 
 // 模糊匹配 $like(LIKE) $notLike(NOT LIKE)
 db.select().from('user').where({name: {$like: '%li'}}); // SELECT * FROM `user` WHERE `name` LIKE '%li';
