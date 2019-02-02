@@ -5,7 +5,8 @@
     "start": "ts-node",
     "prepare": "tsc",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --collectCoverage"
   },
   "dependencies": {
     "@types/mysql": "^2.15.5",
@@ -25,12 +26,14 @@
       "json",
       "ts"
     ],
-    "rootDir": "test",
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "coverageDirectory": "../coverage"
+    "coverageDirectory": "./coverage",
+    "collectCoverageFrom": [
+      "**/src/**"
+    ]
   },
   "description": "Mysql client of sql styled api.",
   "main": "lib/index.js",
