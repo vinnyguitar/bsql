@@ -27,6 +27,18 @@ export class Bsql extends Client {
             });
         });
     }
+
+    public async end() {
+        return new Promise((resolve, reject) => {
+            this.pool.end((err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
 }
 
 export default function bsql(config: mysql.PoolConfig): Bsql {
