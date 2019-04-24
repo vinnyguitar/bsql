@@ -16,7 +16,7 @@ export class Client {
      * @param columns Columns to select.
      */
     public select<T>(...columns: string[]) {
-        const select = new QuerySelect<T>(this.queryFn);
+        const select = new QuerySelect<T[]>(this.queryFn);
         return select.select(...columns);
     }
     /**

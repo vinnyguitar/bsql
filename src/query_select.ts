@@ -9,7 +9,7 @@ enum OrderType {
     Desc = -1,
 }
 
-export class QuerySelect<T> extends Query<T[]> {
+export class QuerySelect<T> extends Query<T> {
 
     constructor(query) {
         super(query);
